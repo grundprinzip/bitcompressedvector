@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 	BitCompressedVector<int> v(SIZE, BITS);
         vector<int> v2;
 
+        double a,b;
+
         long long res = 0;
 
 	for(size_t i=0; i < SIZE; ++i)
@@ -28,7 +30,7 @@ int main(int argc, char* argv[])
 		res += v.get(i);
 	}
         t.stop();
-        std::cout << res << " time " << t.elapsed_time() << std::endl;
+        std::cout << res << " time " << (a = t.elapsed_time()) << std::endl;
 
         res = 0;
         t.start();
@@ -37,7 +39,9 @@ int main(int argc, char* argv[])
                 res += v2[i];
         }
         t.stop();
-        std::cout << res << " time " << t.elapsed_time() << std::endl;
+        std::cout << res << " time " << (b = t.elapsed_time()) << std::endl;
+
+        std::cout << a / b << std::endl;
 	
         if (argc > 1)
         {
@@ -55,7 +59,7 @@ int main(int argc, char* argv[])
                         res += v.get(vPosList[i]);
                 }
                 t.stop();
-                std::cout << res << " time " << t.elapsed_time() << std::endl;
+                std::cout << res << " time " << (a = t.elapsed_time()) << std::endl;
 
                 res = 0;
                 t.start();
@@ -64,7 +68,8 @@ int main(int argc, char* argv[])
                         res += v2[vPosList[i]];
                 }
                 t.stop();
-                std::cout << res << " time " << t.elapsed_time() << std::endl;
+                std::cout << res << " time " << (b = t.elapsed_time()) << std::endl;
+                std::cout << a / b << std::endl;
         }
 
 	return 0;
