@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 
-#define SIZE 1000000
-#define BITS 5
+#define SIZE 10000000
+#define BITS 1
 
 int main(int argc, char* argv[])
 {

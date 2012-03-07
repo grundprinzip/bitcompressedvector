@@ -6,8 +6,8 @@ all: gen
 	g++ -O3 -o main_opt main.cpp -g2 -DNDEBUG
 
 gen:
-	cat bcv_tpl.h > bcv.h
-	python generate.py >> bcv.h
+	cat mask_tpl.h > mask.h
+	python generate.py >> mask.h
 
 clear:
 	$(RM) main
