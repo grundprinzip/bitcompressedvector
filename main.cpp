@@ -3,7 +3,7 @@
 #include "Timer.h"
 #include <vector>
 
-#define SIZE 11
+#define SIZE 100000000
 
 int main()
 {
@@ -13,17 +13,16 @@ int main()
 
         long long res = 0;
 
-	for(size_t i=10; i < SIZE; ++i)
+	for(size_t i=0; i < SIZE; ++i)
 	{
 		v.set(i, i % 8);
                 v2.push_back(i % 8);
 	}
 
         t.start();
-	for(size_t i=10; i < SIZE; ++i)	
+	for(size_t i=0; i < SIZE; ++i)	
 	{
-		//res += v.get(i);
-                std::cout << v.get(i) << std::endl;
+		res += v.get(i);
 	}
         t.stop();
         std::cout << res << " time " << t.elapsed_time() << std::endl;

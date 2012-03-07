@@ -1,6 +1,10 @@
 #include <memory>
 #include <stdexcept>
-#include <numeric>
+
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #ifndef NDEBUG
 #define DEBUG(msg) std::cout << msg << std::endl;
@@ -81,11 +85,10 @@ void BitCompressedVector<T>::set(size_t index, value_type v)
 	data_t pos = _getPos(index);
 	data_t offset = _getOffset(index);
 	data_t bounds = (sizeof(data_t) * 8) - offset;
-
 	data_t mask = ~createMask(offset, _bits);
-    DEBUG("pos " << pos << " offset " << offset << " bounds " << bounds << " mask " << mask);
+    
 	_data[pos] &= mask; 
-	_data[pos] = _data[pos] | (v << offset);
+	_data[pos] = _data[pos] | ((data_t) v << offset);
 
 	if (bounds < _bits)
 	{
@@ -103,9 +106,8 @@ typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(size_t i
 	data_t pos = _getPos(index);
 	data_t offset = _getOffset(index);
 	data_t bounds = (sizeof(data_t) * 8) - offset; // This is almost static expression, that could be handled with a switch case
-
 	data_t mask = createMask(offset, _bits);
-    DEBUG("pos " << pos << " offset " << offset << " bounds " << bounds << " mask " << mask);
+
 
 	result = (mask & _data[pos]) >> offset;
 
