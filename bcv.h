@@ -44,12 +44,17 @@ public:
 	/*
 		Original get method based on the index
 	*/
-	inline value_type get(size_t index) const;
+	inline value_type get(const size_t index) const;
 
 	/*
 		Set method to set a value
 	*/
-	inline void set(size_t index, value_type v);
+	inline void set(const size_t index, const value_type v);
+
+    inline value_type operator[] (const size_t index) const
+    {
+        return get(index);
+    }
 
 private:
 
@@ -84,7 +89,7 @@ private:
 
 
 template<typename T>
-void BitCompressedVector<T>::set(size_t index, value_type v)
+void BitCompressedVector<T>::set(const size_t index, const value_type v)
 {
 	data_t pos = _getPos(index);
 	data_t offset = _getOffset(index, pos * _width);
@@ -238,7 +243,7 @@ void BitCompressedVector<T>::set(size_t index, value_type v)
 }
 
 template<typename T>
-typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(size_t index) const
+typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(const size_t index) const
 {
 	value_type result;
 
