@@ -57,6 +57,8 @@ private:
 	typedef uint8_t byte;
 	typedef uint64_t data_t;
 
+    static const uint8_t _width = sizeof(data_t) * 8;
+
 	// Number of bits to use
 	byte _bits;
 
@@ -68,7 +70,7 @@ private:
 	// get the position of an index inside the list of data values
 	inline size_t _getPos(size_t index) const
 	{
-		return (index * _bits) / (sizeof(data_t) * 8);
+		return (index * _bits) / _width;
 	}
 
         // get the offset of an index inside a block
@@ -79,11 +81,13 @@ private:
 
 };
 
+
+
 template<typename T>
 void BitCompressedVector<T>::set(size_t index, value_type v)
 {
 	data_t pos = _getPos(index);
-	data_t offset = _getOffset(index, pos * sizeof(data_t) * 8);
+	data_t offset = _getOffset(index, pos * _width);
 	data_t bounds = (sizeof(data_t) * 8) - offset;
 	
     data_t mask;
@@ -239,7 +243,7 @@ typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(size_t i
 	value_type result;
 
 	data_t pos = _getPos(index);
-	data_t offset = _getOffset(index, pos * sizeof(data_t) * 8);
+	data_t offset = _getOffset(index, pos * _width);
 	data_t bounds = (sizeof(data_t) * 8) - offset; // This is almost static expression, that could be handled with a switch case
 	data_t mask;
 
