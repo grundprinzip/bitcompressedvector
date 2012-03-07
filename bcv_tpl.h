@@ -72,9 +72,9 @@ private:
 	}
 
         // get the offset of an index inside a block
-	inline size_t _getOffset(size_t index) const
+	inline size_t _getOffset(size_t index, size_t base) const
 	{
-		return (index * _bits) % (sizeof(data_t) * 8);
+		return (index * _bits) - base;
 	}
 
 };
@@ -83,7 +83,7 @@ template<typename T>
 void BitCompressedVector<T>::set(size_t index, value_type v)
 {
 	data_t pos = _getPos(index);
-	data_t offset = _getOffset(index);
+	data_t offset = _getOffset(index, pos * sizeof(data_t) * 8);
 	data_t bounds = (sizeof(data_t) * 8) - offset;
 	data_t mask = ~createMask(offset, _bits);
     
@@ -103,8 +103,9 @@ template<typename T>
 typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(size_t index) const
 {
 	value_type result;
+
 	data_t pos = _getPos(index);
-	data_t offset = _getOffset(index);
+	data_t offset = _getOffset(index, pos * sizeof(data_t) * 8);
 	data_t bounds = (sizeof(data_t) * 8) - offset; // This is almost static expression, that could be handled with a switch case
 	data_t mask = createMask(offset, _bits);
 
