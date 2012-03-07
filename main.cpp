@@ -5,11 +5,13 @@
 #include <iostream>
 #include <vector>
 
-#define SIZE 10000000
 #define BITS 1
 
 int main(int argc, char* argv[])
 {
+        // Setting size
+        long SIZE = atol(argv[1]);
+
         Timer t;
 	BitCompressedVector<int> v(SIZE, BITS);
         vector<int> v2;
@@ -43,7 +45,7 @@ int main(int argc, char* argv[])
 
         std::cout << a / b << std::endl;
 	
-        if (argc > 1)
+        if (argc > 2)
         {
                 std::cout << "random access" << std::endl;
                 std::vector<size_t> vPosList;

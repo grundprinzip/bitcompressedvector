@@ -9,5 +9,12 @@ gen:
 	cat mask_tpl.h > mask.h
 	python generate.py >> mask.h
 
+
+test:
+	./main_opt 1000000
+	./main_opt 10000000
+	./main_opt 100000000
+
+
 clear:
 	$(RM) main
