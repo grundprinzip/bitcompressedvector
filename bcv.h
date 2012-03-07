@@ -65,9 +65,7 @@ private:
 
 	size_t _reserved;
 
-	data_t createMask(size_t offset, byte bits) const;
-
-        // get the position of an index inside the list of data values
+	// get the position of an index inside the list of data values
 	inline size_t _getPos(size_t index) const
 	{
 		return (index * _bits) / (sizeof(data_t) * 8);
