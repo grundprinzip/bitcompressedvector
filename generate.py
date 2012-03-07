@@ -1,5 +1,5 @@
 
-def generate(bits):
+def generate_create_mask(bits):
 
 	buf = "\n\n";
 
@@ -28,5 +28,4 @@ typename BitCompressedVector<T>::data_t BitCompressedVector<T>::createMask(size_
 	return buf
 
 
-
-print generate(64)
+print generate_create_mask(64)

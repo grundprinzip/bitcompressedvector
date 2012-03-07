@@ -1,6 +1,8 @@
-#include <iostream>
 #include "bcv.h"
 #include "Timer.h"
+
+#include <algorithm>
+#include <iostream>
 #include <vector>
 
 #define SIZE 100000000
@@ -37,6 +39,30 @@ int main()
         std::cout << res << " time " << t.elapsed_time() << std::endl;
 	
 
+        std::cout << "random access" << std::endl;
+        std::vector<size_t> vPosList;
+        for(size_t i=0; i < SIZE; ++i)
+                vPosList.push_back(i);
+
+        std::random_shuffle(vPosList.begin(), vPosList.end());
+
+        res = 0;
+        t.start();
+        for(size_t i=0; i < SIZE; ++i)       
+        {
+                res += v.get(vPosList[i]);
+        }
+        t.stop();
+        std::cout << res << " time " << t.elapsed_time() << std::endl;
+
+        res = 0;
+        t.start();
+        for(size_t i=0; i < SIZE; ++i)       
+        {
+                res += v2[vPosList[i]];
+        }
+        t.stop();
+        std::cout << res << " time " << t.elapsed_time() << std::endl;
 
 
 	return 0;
