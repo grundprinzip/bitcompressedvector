@@ -38,7 +38,7 @@ struct PapiTracer
 
 	if(!initialized)
 	{
-		named_mutex mtx(open_or_create, getMutexName("PAPI", "MTX_INIT").c_str());
+		named_mutex mtx(open_or_create, "PAPI_MTX_INIT");
 		scoped_lock<named_mutex> lock(mtx);
 		if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
 			throw runtime_error("PAPI could not be initialized");
