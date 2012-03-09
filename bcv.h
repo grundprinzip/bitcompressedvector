@@ -133,6 +133,7 @@ private:
 
     // Check if we are really 64bit
     static const uint8_t _width = sizeof(data_t) * 8;
+    static const uint64_t _num_blocks = CACHE_LINE_SIZE / sizeof(data_t);
 
 
 	// Number of bits to use
@@ -163,19 +164,13 @@ private:
 template<typename T>
 void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_t *actual) const
 {
-
-    // Number of blocks to extract
-    data_t num_blocks = CACHE_LINE_SIZE / sizeof(data_t);
-
     // First get the initial values
     data_t pos = _getPos(index);
     data_t mask = 0;
 
     // Running values for the loop
     data_t currentValue;
-    size_t currentIndex = index;
-
-    data_t offset = _getOffset(currentIndex, pos * _width);
+    data_t offset = _getOffset(index, pos * _width);
     data_t bounds = _width - offset;
 
     // Base Mask
@@ -184,14 +179,14 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
 
     mask = baseMask << offset;
 
-    size_t counter = 0;
+    *actual = 0;
 
-    size_t upper = _allocated_blocks < pos + num_blocks ? _allocated_blocks : pos + num_blocks;
-    while(pos < upper && counter < _reserved)
+    size_t upper = _allocated_blocks < pos + _num_blocks ? _allocated_blocks : pos + _num_blocks;
+    while(pos < upper && *actual < _reserved)
     {
         currentValue = (mask & _data[pos]) >> offset;
 
-        if (bounds > _bits)
+        if (__builtin_expect((bounds > _bits), 1))
         {
             bounds -= _bits;
             offset += _bits;
@@ -211,11 +206,9 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
         } 
         
         // Append current value
-        data[counter++] = currentValue;
-
+        data[*actual] = currentValue;
+        *actual += 1;
     }
-
-    *actual = counter;
 }
 
 

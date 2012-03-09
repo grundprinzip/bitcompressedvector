@@ -119,6 +119,7 @@ void performance(size_t size)
 
     size_t actual;
     t.start();
+    int flags = PapiTracer::start();
     for(size_t i=0; i < size; )       
     {
         actual = 0;
@@ -129,8 +130,10 @@ void performance(size_t size)
         i += actual;
 
     }
+    PapiTracer::result_t papi = PapiTracer::stop(flags);
     t.stop();
     std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
+    std::cout << papi.first << " " << papi.second << std::endl;
     free(tmp);
 
     ///////////////////////////////////////////////////////////////////////////
