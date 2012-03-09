@@ -13,7 +13,6 @@ using namespace std;
 
 #include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-#include <helper/locking.h>
 
 #include <papi.h>
 #include <pthread.h>
