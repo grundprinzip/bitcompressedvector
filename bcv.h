@@ -86,7 +86,7 @@ private:
 
 
 	typedef uint8_t byte;
-	typedef uint32_t data_t;
+	typedef uint64_t data_t;
 
     static const uint8_t _width = sizeof(data_t) * 8;
 
