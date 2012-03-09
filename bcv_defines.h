@@ -4,7 +4,8 @@
 #define CACHE_LINE_SIZE 64
 
 #define BUILD_MASK_HEADER \
-        const uint64_t global_bit_masks[64] = { \
+        const uint64_t global_bit_masks[65] = { \
+        0 /*CreateMask<0>::mask()*/, \
         CreateMask<1>::mask(), \
         CreateMask<2>::mask(), \
         CreateMask<3>::mask(), \
