@@ -66,7 +66,7 @@ public:
     Typicallay we try to extract at least a single cache line
 
      */
-    inline std::vector<value_type> mget(const size_t index) const;
+    inline void mget(const size_t index, value_type_ptr data, size_t *actual) const;
 
 
 	/*
@@ -116,13 +116,11 @@ private:
 
 
 template<typename T>
-std::vector<typename BitCompressedVector<T>::value_type> BitCompressedVector<T>::mget(const size_t index) const
+void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_t *actual) const
 {
 
     // Number of blocks to extract
     data_t num_blocks = CACHE_LINE_SIZE / sizeof(data_t);
-
-    typename std::vector<value_type> result;
 
     // First get the initial values
     data_t pos = _getPos(index);
@@ -136,6 +134,7 @@ std::vector<typename BitCompressedVector<T>::value_type> BitCompressedVector<T>:
     data_t bounds = _width - offset;
     CREATE_MASK(_bits, mask, offset);
 
+    *actual = 0;
 
     size_t upper = _allocated_blocks < pos + num_blocks ? _allocated_blocks : pos + num_blocks;
     while(pos < upper)
@@ -159,14 +158,11 @@ std::vector<typename BitCompressedVector<T>::value_type> BitCompressedVector<T>:
             offset += _bits;
             mask <<= _bits;
         }
-
         
         // Append current value
-        result.push_back(currentValue);
+        data[*actual] = currentValue;
+        *actual += 1;
     }
-
-
-    return result;
 }
 
 

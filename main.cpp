@@ -35,14 +35,19 @@ int main(int argc, char* argv[])
 
         std::cout << res << " get time " << (a = t.elapsed_time()) << std::endl;
         res = 0;
+
+        int data[110];
+
         t.start();
         for(size_t i=0; i < SIZE; )       
         {
-            std::vector<int> inter = v.mget(i);
-            for(size_t j=0; j < inter.size(); ++j)
-                res += inter[j];
+            size_t actual = 0;
+            v.mget(i, (int*) &data, &actual);
+            for(size_t j=0; j < actual; ++j)
+                res += data[j];
+            
+            i += actual;
 
-            i += inter.size();
         }
         t.stop();
         std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
