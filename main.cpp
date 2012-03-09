@@ -3,99 +3,179 @@
 #include "PapiTracer.h"
 
 #include <algorithm>
+#include <assert.h>
 #include <iostream>
 #include <vector>
 
-#define BITS 5
+#define BITS 3
+
+void test_set(long SIZE)
+{
+    std::cout << "[TEST ] set/get interleaved ..." << std::flush;
+    BitCompressedVector<int> v(SIZE, BITS);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1 << BITS);
+        v.set(i, a);
+        assert(a == v.get(i));
+    }
+    std::cout << " OK" << std::endl;
+}
+
+void test_get(long SIZE)
+{
+    std::cout << "[TEST ] set/get separated ..." << std::flush;
+    BitCompressedVector<int> v(SIZE, BITS);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1 << BITS);
+        v.set(i, a);        
+    }
+
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1 << BITS);
+        assert(a == v.get(i));
+    }
+    std::cout << " OK" << std::endl;
+}
+
+void test_mget(long SIZE)
+{
+    std::cout << "[TEST ] set/mget separated ..." << std::flush;
+    long sum = 0, sum2 = 0;
+    BitCompressedVector<int> v(SIZE, BITS);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1 << BITS);
+        v.set(i, a);        
+        sum += a;
+    }
+
+    size_t alloca = ((64 / BITS)+1) * 8;
+    int *tmp = (int*) malloc(sizeof(int) * alloca);
+
+    for(size_t i=0; i < SIZE; )       
+    {
+        size_t actual = 0;
+        v.mget(i, (int*) tmp, &actual);
+        for(size_t j=0; j < actual; ++j)
+            sum2 += tmp[j];
+        
+        i += actual;
+
+    }
+    free(tmp);
+
+    assert(sum == sum2);
+    std::cout << " OK" << std::endl;
+}
+
+
+template<class C>
+void fill(C& v, size_t size)
+{
+    for(size_t i=0; i < size; ++i)
+        v[i] = i % (1 << BITS);
+}
+
+void performance(size_t size)
+{
+    BitCompressedVector<int> v(size, BITS);
+    std::vector<int> v2(size);
+
+    fill(v, size);
+    fill(v2, size);
+
+    double a,b,c,d;
+
+    Timer t;
+    long long res = 0;
+
+    ///////////////////////////////////////////////////////////////////////////
+    t.start();
+    for(size_t i=0; i < size; i+=1)  
+    {
+        res += v.get(i);                
+    }
+    t.stop();
+    std::cout << res << " get time " << (a = t.elapsed_time()) << std::endl;
+
+    ///////////////////////////////////////////////////////////////////////////
+    res = 0;
+    t.start();
+    for(size_t i=0; i < size; i+=1)  
+    {
+        res += v[i];                
+    }
+    t.stop();
+    std::cout << res << " get[] time " << (b = t.elapsed_time()) << std::endl;
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    res = 0;
+    size_t alloca = ((64 / BITS)+1) * 8;
+    int *tmp = (int*) malloc(sizeof(int) * alloca);
+
+    size_t actual;
+    t.start();
+    for(size_t i=0; i < size; )       
+    {
+        actual = 0;
+        v.mget(i, (int*) tmp, &actual);
+        for(size_t j=0; j < actual; ++j)
+            res += tmp[j];
+        
+        i += actual;
+
+    }
+    t.stop();
+    std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
+    free(tmp);
+
+    ///////////////////////////////////////////////////////////////////////////
+    res = 0;
+    t.start();
+    for(size_t i=0; i < size; i+=1)  
+    {
+        res += v2[i];                
+    }
+    t.stop();
+    std::cout << res << " vector time " << (d = t.elapsed_time()) << std::endl;
+}
+
 
 int main(int argc, char* argv[])
 {
-        // Setting size
-        long SIZE = atol(argv[1]);
+    // Setting size
+    long SIZE = atol(argv[1]);
 
-        Timer t;
-	   BitCompressedVector<int> v(SIZE, BITS);
-        vector<int> v2;
+    test_set(SIZE);
+    test_get(SIZE);
+    test_mget(SIZE);
 
-        double a,b,c;
 
-        long long res = 0;
+    performance(SIZE);
 
-    	for(size_t i=0; i < SIZE; ++i)
-    	{
-    		v.set(i, i % (1 << BITS));
-                    v2.push_back(i % (1 << BITS));
-    	}
 
-        t.start();
-    	for(size_t i=0; i < SIZE; i+=1)	
-    	{
-    		res += v.get(i);                
-    	}
-        t.stop();
-
-        std::cout << res << " get time " << (a = t.elapsed_time()) << std::endl;
-        res = 0;
-
-        int data[110];
-
-        t.start();
-        int flags = PapiTracer::start();
-        for(size_t i=0; i < SIZE; )       
-        {
-            size_t actual = 0;
-            v.mget(i, (int*) &data, &actual);
-            for(size_t j=0; j < actual; ++j)
-                res += data[j];
+     //    t.start();
+     //    int flags = PapiTracer::start();
+     //    for(size_t i=0; i < SIZE; )       
+     //    {
+     //        size_t actual = 0;
+     //        v.mget(i, (int*) &tmp, &actual);
+     //        for(size_t j=0; j < actual; ++j)
+     //            res += tmp[j];
             
-            i += actual;
+     //        i += actual;
 
-        }
-        PapiTracer::result_t r = PapiTracer::stop(flags);
-        t.stop();
-        std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
-        std::cout << r.first << " CYC " << r.second << std::endl;
+     //    }
+     //    PapiTracer::result_t r = PapiTracer::stop(flags);
+     //    t.stop();
+     //    free(tmp);
+     //    std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
+     //    std::cout << r.first << " CYC " << r.second << std::endl;
 
-        res = 0;
-        t.start();
-        for(size_t i=0; i < SIZE; ++i)       
-        {
-                res += v2[i];
-        }
-        t.stop();
-        std::cout << res << " vector time " << (c = t.elapsed_time()) << std::endl;
-
-        std::cout << a / c << std::endl;
-        std::cout << b / c << std::endl;
-	
-        if (argc > 2)
-        {
-                std::cout << "random access" << std::endl;
-                std::vector<size_t> vPosList;
-                for(size_t i=0; i < SIZE; ++i)
-                        vPosList.push_back(i);
-
-                std::random_shuffle(vPosList.begin(), vPosList.end());
-
-                res = 0;
-                t.start();
-                for(size_t i=0; i < SIZE; ++i)       
-                {
-                        res += v.get(vPosList[i]);
-                }
-                t.stop();
-                std::cout << res << " time " << (a = t.elapsed_time()) << std::endl;
-
-                res = 0;
-                t.start();
-                for(size_t i=0; i < SIZE; ++i)       
-                {
-                        res += v2[vPosList[i]];
-                }
-                t.stop();
-                std::cout << res << " time " << (b = t.elapsed_time()) << std::endl;
-                std::cout << a / b << std::endl;
-        }
-
+   
 	return 0;
 }

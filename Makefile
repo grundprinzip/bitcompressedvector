@@ -15,7 +15,7 @@ profile:
 	pprof --pdf ./main_opt /tmp/bcv.prof > bcv.pdf
 
 papi:
-	g++ -O3 -o main_opt main.cpp -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE
+	g++ -O3 -o main_opt main.cpp -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread
 
 test:
 	./main_opt 1000000

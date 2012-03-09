@@ -74,21 +74,66 @@ public:
 	 */
 	inline void set(const size_t index, const value_type v);
 
+    
+
+
+    /*
+        This small class is a simple proxy class that let's us handle reference 
+        values to indizes in the bitvector without actually having a direct reference
+    */
+    struct BitVectorProxy
+    {
+        size_t _index;
+        BitCompressedVector<T> *_vector;
+
+        BitVectorProxy(size_t idx, BitCompressedVector<T> *v): _index(idx), _vector(v)
+        {}
+
+        // Implicit conversion operator used for rvalues of T
+        inline operator const T () const 
+        {
+            return _vector->get(_index);
+        }
+
+        // Usins the Proxy to set the value using the subscript as an lvalue
+        inline BitVectorProxy& operator= (const T& rvalue)
+        {
+            _vector->set(_index, rvalue);
+            return *this;
+        }
+
+    };
+
     /*
      * Shortcut method for get(size_t index)
      */
-    inline value_type operator[] (const size_t index) const
+    inline const BitVectorProxy operator[] (const size_t index) const
     {
-        return get(index);
+        return BitVectorProxy(index, this);
     }
+
+    inline BitVectorProxy operator[] (const size_t index)
+    {
+        return BitVectorProxy(index, this);
+    }
+
+
+    
+
 
 private:
 
 
 	typedef uint8_t byte;
 	typedef uint64_t data_t;
+    
+    // function pointer helper
+    typedef data_t (*mask_fun_ptr)(void);
 
+
+    // Check if we are really 64bit
     static const uint8_t _width = sizeof(data_t) * 8;
+
 
 	// Number of bits to use
 	byte _bits;
@@ -132,16 +177,21 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
 
     data_t offset = _getOffset(currentIndex, pos * _width);
     data_t bounds = _width - offset;
-    CREATE_MASK(_bits, mask, offset);
 
-    *actual = 0;
+    // Base Mask
+    data_t baseMask = 0;
+    CREATE_MASK(_bits, baseMask);
+
+    mask = baseMask << offset;
+
+    size_t counter = 0;
 
     size_t upper = _allocated_blocks < pos + num_blocks ? _allocated_blocks : pos + num_blocks;
-    while(pos < upper)
+    while(pos < upper && counter < _reserved)
     {
         currentValue = (mask & _data[pos]) >> offset;
 
-        if (__builtin_expect(bounds > _bits, 1))
+        if (bounds > _bits)
         {
             bounds -= _bits;
             offset += _bits;
@@ -150,20 +200,22 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
         } else {
 
             data_t b = _bits - bounds;
-            CREATE_MASK(b, mask, 0);
+            CREATE_MASK(b, mask);
             currentValue |= (mask & _data[pos + 1]) << bounds;
 
             // Increment pos
             ++pos;
             offset = b;
             bounds = _width - offset;
-            CREATE_MASK(_bits, mask, offset);
+            mask = baseMask << offset;
         } 
         
         // Append current value
-        data[*actual] = currentValue;
-        *actual += 1;
+        data[counter++] = currentValue;
+
     }
+
+    *actual = counter;
 }
 
 
@@ -174,17 +226,17 @@ void BitCompressedVector<T>::set(const size_t index, const value_type v)
 	data_t offset = _getOffset(index, pos * _width);
 	data_t bounds = _width - offset;
 	
-    data_t mask;
-    CREATE_MASK(_bits, mask, offset);
-    mask = ~mask;
+    data_t mask, baseMask;
+    CREATE_MASK(_bits, baseMask);
+    mask = ~(baseMask << offset);
+    
 
 	_data[pos] &= mask; 
 	_data[pos] = _data[pos] | ((data_t) v << offset);
 
 	if (bounds < _bits)
-	{
-        CREATE_MASK(_bits, mask, offset);
-        mask = ~mask;
+	{        
+        mask = ~(baseMask << offset); // we have a an overflow here thatswhy we do not need to care about the original stuff
 
 	   _data[pos + 1] &= mask; // clear bits
        _data[pos + 1] |= v >> bounds; // set bits and shift by the number of bits we already inserted
@@ -202,14 +254,16 @@ typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(const si
 	data_t offset = _getOffset(index, pos * _width);
 	data_t bounds = _width - offset; // This is almost static expression, that could be handled with a switch case
 	
-    CREATE_MASK(_bits, mask, offset);
+    CREATE_MASK(_bits, mask);
+    mask <<= offset;
 
 	result = (mask & _data[pos]) >> offset;
 
 	if (bounds < _bits)
 	{
         data_t b = _bits - bounds;
-        CREATE_MASK(b, mask, 0);
+        CREATE_MASK(b, mask);
+
 		result |= (mask & _data[pos + 1]) << bounds;
 	} 
 	return result;

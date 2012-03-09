@@ -11,7 +11,7 @@ template<>
 struct CreateMask<%d>
 {
 
-    static inline uint64_t mask(size_t offset)
+    static inline uint64_t mask()
 	{
 """ % b
 			
@@ -20,7 +20,7 @@ struct CreateMask<%d>
 			if i > 0:
 				result <<= 1
 			result += 1
-		buf += "        return " + str(result) + "ULL << offset;"
+		buf += "        return " + str(result) + "ULL;"
 		buf += """    
     }
 };

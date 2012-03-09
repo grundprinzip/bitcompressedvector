@@ -34,6 +34,11 @@ struct PapiTracer
             return -1;
 
 #ifdef USE_PAPI_TRACE
+
+
+    //ovverride event settings
+    eventName = std::string(getenv("PAPI_EVENT"));
+
 	static bool initialized = false;
 
 	if(!initialized)
