@@ -66,7 +66,6 @@ void test_mget(long SIZE)
 
     }
     free(tmp);
-
     assert(sum == sum2);
     std::cout << " OK" << std::endl;
 }
@@ -123,7 +122,7 @@ void performance(size_t size)
     for(size_t i=0; i < size; )       
     {
         actual = 0;
-        v.mget(i, (int*) tmp, &actual);
+        v.mget(i, tmp, &actual);
         for(size_t j=0; j < actual; ++j)
             res += tmp[j];
         

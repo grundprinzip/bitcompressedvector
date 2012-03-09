@@ -176,33 +176,33 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
     // Base Mask
     data_t baseMask = 0;
     CREATE_MASK(_bits, baseMask);
-
-    mask = baseMask << offset;
-
+    
+    // Counter and block
     *actual = 0;
+    // Align the block according to the offset
+    data_t block = _data[pos] >>  offset;    
 
     size_t upper = _allocated_blocks < pos + _num_blocks ? _allocated_blocks : pos + _num_blocks;
     while(pos < upper && *actual < _reserved)
     {
-        currentValue = (mask & _data[pos]) >> offset;
 
-        if (__builtin_expect((bounds > _bits), 1))
+        // Extract the value
+        currentValue = (baseMask & block);
+
+        if (bounds > _bits)
         {
-            bounds -= _bits;
-            offset += _bits;
-            mask <<= _bits;
+            bounds -= _bits;            
+            block >>= _bits;
 
         } else {
 
-            data_t b = _bits - bounds;
-            CREATE_MASK(b, mask);
-            currentValue |= (mask & _data[pos + 1]) << bounds;
+            offset = _bits - bounds;
+            CREATE_MASK(offset, mask);
+            currentValue |= (mask & _data[++pos]) << bounds;
 
-            // Increment pos
-            ++pos;
-            offset = b;
-            bounds = _width - offset;
-            mask = baseMask << offset;
+            // Assign new block
+            block = _data[pos] >> offset;
+            bounds = _width - offset;            
         } 
         
         // Append current value
