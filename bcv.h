@@ -86,7 +86,7 @@ private:
 
 
 	typedef uint8_t byte;
-	typedef uint64_t data_t;
+	typedef uint32_t data_t;
 
     static const uint8_t _width = sizeof(data_t) * 8;
 
@@ -141,8 +141,14 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
     {
         currentValue = (mask & _data[pos]) >> offset;
 
-        if (bounds < _bits)
+        if (__builtin_expect(bounds > _bits, 1))
         {
+            bounds -= _bits;
+            offset += _bits;
+            mask <<= _bits;
+
+        } else {
+
             data_t b = _bits - bounds;
             CREATE_MASK(b, mask, 0);
             currentValue |= (mask & _data[pos + 1]) << bounds;
@@ -152,12 +158,7 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
             offset = b;
             bounds = _width - offset;
             CREATE_MASK(_bits, mask, offset);
-
-        } else {
-            bounds -= _bits;
-            offset += _bits;
-            mask <<= _bits;
-        }
+        } 
         
         // Append current value
         data[*actual] = currentValue;
