@@ -1,5 +1,6 @@
 #include "bcv.h"
 #include "Timer.h"
+#include "PapiTracer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -39,6 +40,7 @@ int main(int argc, char* argv[])
         int data[110];
 
         t.start();
+        int flags = PapiTracer::start();
         for(size_t i=0; i < SIZE; )       
         {
             size_t actual = 0;
@@ -49,8 +51,10 @@ int main(int argc, char* argv[])
             i += actual;
 
         }
+        PapiTracer::result_t r = PapiTracer::stop(flags);
         t.stop();
         std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
+        std::cout << r.first << " CYC " << r.second << std::endl;
 
         res = 0;
         t.start();

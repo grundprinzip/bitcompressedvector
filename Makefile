@@ -14,6 +14,8 @@ profile:
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./main_opt 100000000
 	pprof --pdf ./main_opt /tmp/bcv.prof > bcv.pdf
 
+papi:
+	g++ -O3 -o main_opt main.cpp -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE
 
 test:
 	./main_opt 1000000
