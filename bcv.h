@@ -17,6 +17,8 @@
 #define DEBUG(msg)
 #endif
 
+
+BUILD_MASK_HEADER
 /*
 
  This class provides a numeric bit compressed vector. 
@@ -174,8 +176,7 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
     data_t bounds = _width - offset;
 
     // Base Mask
-    data_t baseMask = 0;
-    CREATE_MASK(_bits, baseMask);
+    data_t baseMask = global_bit_masks[_bits -1 ];    
     
     // Counter and block
     *actual = 0;
@@ -197,7 +198,8 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
         } else {
 
             offset = _bits - bounds;
-            CREATE_MASK(offset, mask);
+            mask = global_bit_masks[offset - 1];
+            
             currentValue |= (mask & _data[++pos]) << bounds;
 
             // Assign new block
@@ -220,7 +222,7 @@ void BitCompressedVector<T>::set(const size_t index, const value_type v)
 	data_t bounds = _width - offset;
 	
     data_t mask, baseMask;
-    CREATE_MASK(_bits, baseMask);
+    baseMask = global_bit_masks[_bits - 1];
     mask = ~(baseMask << offset);
     
 
@@ -247,7 +249,7 @@ typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(const si
 	data_t offset = _getOffset(index, pos * _width);
 	data_t bounds = _width - offset; // This is almost static expression, that could be handled with a switch case
 	
-    CREATE_MASK(_bits, mask);
+    mask = global_bit_masks[_bits- 1];
     mask <<= offset;
 
 	result = (mask & _data[pos]) >> offset;
@@ -255,7 +257,7 @@ typename BitCompressedVector<T>::value_type BitCompressedVector<T>::get(const si
 	if (bounds < _bits)
 	{
         data_t b = _bits - bounds;
-        CREATE_MASK(b, mask);
+        mask = global_bit_masks[b - 1];
 
 		result |= (mask & _data[pos + 1]) << bounds;
 	} 
