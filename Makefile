@@ -12,7 +12,7 @@ gen:
 profile:
 	g++ -O3 -o main_opt main.cpp -g2 -DNDEBUG -lprofiler
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./main_opt 100000000
-	pprof --pdf ./main_opt /tmp/bcv.prof
+	pprof --pdf ./main_opt /tmp/bcv.prof > bcv.pdf
 
 
 test:
