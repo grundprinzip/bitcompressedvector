@@ -96,28 +96,6 @@ void test_mget_fixed(long SIZE)
         
         for(size_t j=0; j < actual; ++j)
             sum2 += tmp[j];
-
-        // sum2 += tmp[0];
-        // sum2 += tmp[1];
-        // sum2 += tmp[2];
-        // sum2 += tmp[3];
-        // sum2 += tmp[4];
-        // sum2 += tmp[5];
-        // sum2 += tmp[6];
-        // sum2 += tmp[7];
-        // sum2 += tmp[8];
-        // sum2 += tmp[9];
-        // sum2 += tmp[10];
-        // sum2 += tmp[11];
-        // sum2 += tmp[12];
-        // sum2 += tmp[13];
-        // sum2 += tmp[14];
-        // sum2 += tmp[15];
-        // sum2 += tmp[16];
-        // sum2 += tmp[17];
-        // sum2 += tmp[18];
-        // sum2 += tmp[19];
-        
         i += actual;
 
     }
@@ -247,25 +225,5 @@ int main(int argc, char* argv[])
 
     performance(SIZE);
 
-
-     //    t.start();
-     //    int flags = PapiTracer::start();
-     //    for(size_t i=0; i < SIZE; )       
-     //    {
-     //        size_t actual = 0;
-     //        v.mget(i, (int*) &tmp, &actual);
-     //        for(size_t j=0; j < actual; ++j)
-     //            res += tmp[j];
-            
-     //        i += actual;
-
-     //    }
-     //    PapiTracer::result_t r = PapiTracer::stop(flags);
-     //    t.stop();
-     //    free(tmp);
-     //    std::cout << res << " mget time " << (b = t.elapsed_time()) << std::endl;
-     //    std::cout << r.first << " CYC " << r.second << std::endl;
-
-   
 	return 0;
 }
