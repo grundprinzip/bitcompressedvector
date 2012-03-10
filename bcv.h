@@ -70,7 +70,7 @@ public:
      */
     inline void mget(const size_t index, value_type_ptr data, size_t *actual) const;
 
-    inline void mget_fixed(const size_t index, value_type_ptr data, size_t limit) const;
+    inline void mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const;
 
 
 	/*
@@ -218,7 +218,7 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
 }
 
 template<typename T>
-void BitCompressedVector<T>::mget_fixed(const size_t index, value_type_ptr data, size_t limit) const
+void BitCompressedVector<T>::mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const
 {
     // First get the initial values
     data_t pos = _getPos(index);
@@ -237,8 +237,10 @@ void BitCompressedVector<T>::mget_fixed(const size_t index, value_type_ptr data,
     data_t block = _data[pos] >>  offset;    
 
     size_t counter = 0;
-    //size_t upper = _allocated_blocks < pos + _num_blocks ? _allocated_blocks : pos + _num_blocks;
-    while(counter < limit)
+    size_t current = (pos * _width + offset) / _bits;
+    size_t upper = *limit < (_reserved - current) ? *limit : _reserved - current;
+
+    while(counter < upper)
     {
 
         // Extract the value
@@ -264,6 +266,9 @@ void BitCompressedVector<T>::mget_fixed(const size_t index, value_type_ptr data,
         // Append current value
         data[counter++] = currentValue;        
     }
+
+    // Update the counter
+    *limit = counter;
 }
 
 template<typename T>

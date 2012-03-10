@@ -91,31 +91,34 @@ void test_mget_fixed(long SIZE)
 
     for(size_t i=0; i < SIZE; )       
     {
-        size_t actual = 0;
-        v.mget_fixed(i, tmp, 20);
+        size_t actual = 16;
+        v.mget_fixed(i, tmp, &actual);
         
-        sum2 += tmp[0];
-        sum2 += tmp[1];
-        sum2 += tmp[2];
-        sum2 += tmp[3];
-        sum2 += tmp[4];
-        sum2 += tmp[5];
-        sum2 += tmp[6];
-        sum2 += tmp[7];
-        sum2 += tmp[8];
-        sum2 += tmp[9];
-        sum2 += tmp[10];
-        sum2 += tmp[11];
-        sum2 += tmp[12];
-        sum2 += tmp[13];
-        sum2 += tmp[14];
-        sum2 += tmp[15];
-        sum2 += tmp[16];
-        sum2 += tmp[17];
-        sum2 += tmp[18];
-        sum2 += tmp[19];
+        for(size_t j=0; j < actual; ++j)
+            sum2 += tmp[j];
+
+        // sum2 += tmp[0];
+        // sum2 += tmp[1];
+        // sum2 += tmp[2];
+        // sum2 += tmp[3];
+        // sum2 += tmp[4];
+        // sum2 += tmp[5];
+        // sum2 += tmp[6];
+        // sum2 += tmp[7];
+        // sum2 += tmp[8];
+        // sum2 += tmp[9];
+        // sum2 += tmp[10];
+        // sum2 += tmp[11];
+        // sum2 += tmp[12];
+        // sum2 += tmp[13];
+        // sum2 += tmp[14];
+        // sum2 += tmp[15];
+        // sum2 += tmp[16];
+        // sum2 += tmp[17];
+        // sum2 += tmp[18];
+        // sum2 += tmp[19];
         
-        i += 20;
+        i += actual;
 
     }
     free(tmp);
@@ -192,26 +195,32 @@ void performance(size_t size)
     tmp = (int*) malloc(sizeof(int) * 16);
     res = 0;
     t.start();
-    for(size_t i=0; i < size; i+=16)       
+    actual = 0;
+    for(size_t i=0; i < size; )       
     {        
-        v.mget_fixed(i, tmp, 16);
+        actual = 16;
+        v.mget_fixed(i, tmp, &actual);
         
-        res += tmp[0];
-        res += tmp[1];
-        res += tmp[2];
-        res += tmp[3];
-        res += tmp[4];
-        res += tmp[5];
-        res += tmp[6];
-        res += tmp[7];
-        res += tmp[8];
-        res += tmp[9];
-        res += tmp[10];
-        res += tmp[11];
-        res += tmp[12];
-        res += tmp[13];
-        res += tmp[14];
-        res += tmp[15];
+        for(size_t j=0; j < actual; ++j)
+            res += tmp[j];
+
+        i += actual;
+        // res += tmp[0];
+        // res += tmp[1];
+        // res += tmp[2];
+        // res += tmp[3];
+        // res += tmp[4];
+        // res += tmp[5];
+        // res += tmp[6];
+        // res += tmp[7];
+        // res += tmp[8];
+        // res += tmp[9];
+        // res += tmp[10];
+        // res += tmp[11];
+        // res += tmp[12];
+        // res += tmp[13];
+        // res += tmp[14];
+        // res += tmp[15];
     }
     t.stop();
     std::cout << res << " mget fixed time " << (d = t.elapsed_time()) << std::endl;
