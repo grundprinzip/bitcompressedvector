@@ -189,13 +189,12 @@ void performance(size_t size)
     free(tmp);
 
     ///////////////////////////////////////////////////////////////////////////
-    tmp = (int*) malloc(sizeof(int) * 20);
+    tmp = (int*) malloc(sizeof(int) * 16);
     res = 0;
     t.start();
-    for(size_t i=0; i < size; )       
-    {
-        size_t actual = 0;
-        v.mget_fixed(i, tmp, 20);
+    for(size_t i=0; i < size; i+=16)       
+    {        
+        v.mget_fixed(i, tmp, 16);
         
         res += tmp[0];
         res += tmp[1];
@@ -213,13 +212,6 @@ void performance(size_t size)
         res += tmp[13];
         res += tmp[14];
         res += tmp[15];
-        res += tmp[16];
-        res += tmp[17];
-        res += tmp[18];
-        res += tmp[19];
-        
-        i += 20;
-
     }
     t.stop();
     std::cout << res << " mget fixed time " << (d = t.elapsed_time()) << std::endl;
