@@ -201,26 +201,28 @@ void performance(size_t size)
         actual = 16;
         v.mget_fixed(i, tmp, &actual);
         
-        for(size_t j=0; j < actual; ++j)
-            res += tmp[j];
+        // for(size_t j=0; j < actual; ++j)
+        //     res += tmp[j];
+        
+        res += tmp[0];
+        res += tmp[1];
+        res += tmp[2];
+        res += tmp[3];
+        res += tmp[4];
+        res += tmp[5];
+        res += tmp[6];
+        res += tmp[7];
+        res += tmp[8];
+        res += tmp[9];
+        res += tmp[10];
+        res += tmp[11];
+        res += tmp[12];
+        res += tmp[13];
+        res += tmp[14];
+        res += tmp[15];
 
         i += actual;
-        // res += tmp[0];
-        // res += tmp[1];
-        // res += tmp[2];
-        // res += tmp[3];
-        // res += tmp[4];
-        // res += tmp[5];
-        // res += tmp[6];
-        // res += tmp[7];
-        // res += tmp[8];
-        // res += tmp[9];
-        // res += tmp[10];
-        // res += tmp[11];
-        // res += tmp[12];
-        // res += tmp[13];
-        // res += tmp[14];
-        // res += tmp[15];
+
     }
     t.stop();
     std::cout << res << " mget fixed time " << (d = t.elapsed_time()) << std::endl;

@@ -70,6 +70,15 @@ public:
      */
     inline void mget(const size_t index, value_type_ptr data, size_t *actual) const;
 
+    /*
+    This method is similar to mget(), however the number of elements extracted 
+    is limited externally, and not by the size of the block inside the compressed
+    vector.
+
+        @param size_t index
+        @param value_type_ptr data
+        @param size_t *limit The number of elements to extract, no range check is performed!!
+    */
     inline void mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const;
 
 
@@ -181,7 +190,8 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
     data_t baseMask = global_bit_masks[_bits];    
     
     // Counter and block
-    *actual = 0;
+    size_t counter = 0;
+    
     // Align the block according to the offset
     data_t block = _data[pos] >>  offset;    
 
@@ -189,7 +199,7 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
     size_t current = (pos * _width + offset) / _bits;
     size_t upper = left < (_reserved - current) ? left : _reserved - current;
 
-    while(*actual < upper)
+    while(counter < upper)
     {
 
         // Extract the value
@@ -212,9 +222,10 @@ void BitCompressedVector<T>::mget(const size_t index, value_type_ptr data, size_
         } 
         
         // Append current value
-        data[*actual] = currentValue;
-        *actual += 1;
+        data[counter++] = currentValue;        
     }
+
+    *actual = counter;
 }
 
 template<typename T>
@@ -232,14 +243,11 @@ void BitCompressedVector<T>::mget_fixed(const size_t index, value_type_ptr data,
     // Base Mask
     data_t baseMask = global_bit_masks[_bits];    
     
-    
     // Align the block according to the offset
     data_t block = _data[pos] >>  offset;    
 
     size_t counter = 0;
-    size_t current = (pos * _width + offset) / _bits;
-    size_t upper = *limit < (_reserved - current) ? *limit : _reserved - current;
-
+    size_t upper = *limit;
     while(counter < upper)
     {
 
