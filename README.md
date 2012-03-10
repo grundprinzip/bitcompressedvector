@@ -13,9 +13,9 @@ sequential scan speed of a std::vector.
 
 The BCV is intended to be a drop-in replacement of ``std::vector``, however, currently it is only of fixed size and does not support any kind of iterator interface. The access methods to the vector are:
 
-	1. Index-based subscript
-	1. Index-based ``get``/``set()``
-	1. Multi-get based
+  1. Index-based subscript
+  1. Index-based ``get``/``set()``
+  1. Multi-get based
 
 The index-based access allows array subscript operator access, however this is
 proxy access around the get() / set() methods. Especially the ``[]`` as lvalue
@@ -44,11 +44,11 @@ for sequential scans but allowing to save a significant amount of memory
 For a vector with 100M elements the sequential scan speed is on a Intel Xeon
 7560 and 5 bits stored for 32 bit integers a scan aggregating all values takes:
 
-	* get time ``0.329251``s
-	* get[] time ``0.329185``s
-	* mget time ``0.276978``s
-	* mget fixed time ``0.168968``s
-	* vector time ``0.191044``s
+  * get time ``0.329251``s
+  * get[] time ``0.329185``s
+  * mget time ``0.276978``s
+  * mget fixed time ``0.168968``s
+  * vector time ``0.191044``s
 
 The memory consumption for the vector is ~ 400MB and for the bit compressed
 vector ~ 60MB.
