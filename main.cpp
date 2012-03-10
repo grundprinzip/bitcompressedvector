@@ -196,13 +196,10 @@ void performance(size_t size)
     res = 0;
     t.start();
     actual = 0;
-    for(size_t i=0; i < size; )       
+    for(size_t i=0; i < size; i+= 16)       
     {        
         actual = 16;
         v.mget_fixed(i, tmp, &actual);
-        
-        // for(size_t j=0; j < actual; ++j)
-        //     res += tmp[j];
         
         res += tmp[0];
         res += tmp[1];
@@ -220,8 +217,6 @@ void performance(size_t size)
         res += tmp[13];
         res += tmp[14];
         res += tmp[15];
-
-        i += actual;
 
     }
     t.stop();
