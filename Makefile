@@ -26,6 +26,7 @@ test:
 release: gen
 	$(RM) -Rf pkg/bcv
 	mkdir -p pkg/bcv
+	cp bcv_defines.h pkg/bcv
 	cp mask.h pkg/bcv
 	cp bcv.h pkg/bcv
 	tar -C pkg -zcvf bcv.tgz bcv
