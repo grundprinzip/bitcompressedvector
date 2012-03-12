@@ -1,10 +1,12 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
+CXXFLAGS= -g2  -mtune=native -mssse3 -msse4.1
+
 all: gen
-	mkdir $(BUILD_DIR)
-	g++ -o $(BUILD_DIR)/main main.cpp -g2
-	g++ -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG
+	mkdir -p $(BUILD_DIR)
+	g++ -o $(BUILD_DIR)/main main.cpp $(CXXFLAGS)
+	g++ -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG $(CXXFLAGS)
 
 gen:
 	cat mask_tpl.h > mask.h
