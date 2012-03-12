@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
-CXXFLAGS= -g2  -mtune=native -mssse3 -msse4.1
+CXXFLAGS= -g2  -mtune=native -mssse3 -msse4.1 -funroll-loops
 
 all: gen
 	mkdir -p $(BUILD_DIR)

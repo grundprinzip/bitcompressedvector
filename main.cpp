@@ -230,13 +230,13 @@ void performance(size_t size)
     free(tmp);
 
     ///////////////////////////////////////////////////////////////////////////
-    tmp = (int*) malloc(sizeof(int) * 16);
+    tmp = (int*) malloc(sizeof(int) * 32);
     res = 0;
     t.start();
     actual = 0;
-    for(size_t i=0; i < size; i+= 16)       
+    for(size_t i=0; i < size; i+= 32)       
     {        
-        actual = 16;
+        actual = 32;
         v.mget_fixed(i, tmp, &actual);
         
         res += tmp[0];
@@ -256,6 +256,23 @@ void performance(size_t size)
         res += tmp[14];
         res += tmp[15];
 
+        res += tmp[16];
+        res += tmp[17];
+        res += tmp[18];
+        res += tmp[19];
+        res += tmp[20];
+        res += tmp[21];
+        res += tmp[22];
+        res += tmp[23];
+        res += tmp[24];
+        res += tmp[25];
+        res += tmp[26];
+        res += tmp[27];
+        res += tmp[28];
+        res += tmp[29];
+        res += tmp[30];
+        res += tmp[31];
+
     }
     t.stop();
     std::cout << res << " mget fixed time " << (d = t.elapsed_time()) << std::endl;
@@ -264,9 +281,24 @@ void performance(size_t size)
     ///////////////////////////////////////////////////////////////////////////
     res = 0;
     t.start();
-    for(size_t i=0; i < size; i+=1)  
+    for(size_t i=0; i < size; i+=16)  
     {
-        res += v2[i];                
+        res += v2[i];
+        res += v2[i+1];
+        res += v2[i+2];
+        res += v2[i+3];
+        res += v2[i+4];
+        res += v2[i+5];
+        res += v2[i+6];
+        res += v2[i+7];
+        res += v2[i+8];
+        res += v2[i+9];
+        res += v2[i+10];
+        res += v2[i+11];
+        res += v2[i+12];
+        res += v2[i+13];
+        res += v2[i+14];
+        res += v2[i+15];
     }
     t.stop();
     std::cout << res << " vector time " << (e = t.elapsed_time()) << std::endl;

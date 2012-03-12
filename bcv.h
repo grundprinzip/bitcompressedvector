@@ -30,7 +30,7 @@
 
 
 
-BUILD_MASK_HEADER
+BUILD_MASK_HEADER;
 /*
 
  This class provides a numeric bit compressed vector. 
@@ -241,7 +241,6 @@ void BitCompressedVector<T, B>::mget_fixed(const size_t index, value_type_ptr da
 {
     // First get the initial values
     data_t pos = _getPos(index);
-    data_t mask = 0;
 
     // Running values for the loop
     data_t currentValue;
@@ -249,42 +248,35 @@ void BitCompressedVector<T, B>::mget_fixed(const size_t index, value_type_ptr da
     data_t bounds = _width - offset;
 
     // Base Mask
-    data_t baseMask = global_bit_masks[B];    
+    const data_t baseMask = global_bit_masks[B];    
     
     // Align the block according to the offset
     data_t block = _data[pos] >>  offset;    
 
-    size_t counter = 0;
     size_t upper = *limit;
-    while(counter < upper)
+    for(size_t counter = 0; counter < upper; ++counter)
     {
-
         // Extract the value
         currentValue = (baseMask & block);
 
-        if (bounds > B)
+        if (!(bounds > B))
+        {
+            offset = B - bounds;
+            block = _data[++pos];
+            currentValue |= (global_bit_masks[offset] & block) << bounds;
+
+            // Assign new block
+            block >>= offset;
+            bounds = _width - offset;            
+        } else 
         {
             bounds -= B;            
             block >>= B;
-
-        } else {
-
-            offset = B - bounds;
-            mask = global_bit_masks[offset];
-            
-            currentValue |= (mask & _data[++pos]) << bounds;
-
-            // Assign new block
-            block = _data[pos] >> offset;
-            bounds = _width - offset;            
-        } 
+        }
         
         // Append current value
-        data[counter++] = currentValue;        
+        data[counter] = currentValue;
     }
-
-    // Update the counter
-    *limit = counter;
 }
 
 template<typename T, uint8_t B>
