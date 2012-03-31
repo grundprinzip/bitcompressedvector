@@ -93,6 +93,7 @@ public:
     */
     inline void mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const;
 
+    inline void mget_fixed2(const size_t index, value_type_ptr data, size_t *limit) const;
 
 	/*
 	 *	Set method to set a value
@@ -179,7 +180,46 @@ private:
 		return (index * B) - base;
 	}
 
+    // returns the offset mask for any given index
+    inline data_t buildMask(size_t index) const
+    {
+        return (index * B) % _width;
+    }
+
 };
+
+#define BRANCH_FREE_LT(x,y) (((x & ~y) | ((~(x ^ y)) & x - y)) >>  63)
+
+template<typename T, uint8_t B>
+void BitCompressedVector<T, B>::mget_fixed2(const size_t index, value_type_ptr data, size_t *limit) const
+{
+    // First get the initial values
+    data_t pos = _getPos(index);
+
+    // Running values for the loop
+    data_t currentValue;
+
+    // Base Mask, masks the lowest bits according to B
+    const data_t baseMask = global_bit_masks[B];    
+    
+    size_t upper = index + *limit;
+    size_t mempos = 0;
+    for(size_t counter = index; counter < upper; ++counter)
+    {
+        // Extract the value
+        data_t offset = buildMask(counter);
+        data[mempos] = (_data[pos] >> offset) & baseMask;
+
+        // base expression
+        size_t bounds = _width - offset;
+        data_t val = BRANCH_FREE_LT(bounds,B);
+        
+        // Reduce Branch
+        data[mempos++] |= val * ((_data[pos + 1] & global_bit_masks[B - bounds]) << bounds);
+
+        pos += val;
+    }
+}
 
 
 template<typename T, uint8_t B>
