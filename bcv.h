@@ -1,3 +1,6 @@
+#ifndef BCV_BCV_H
+#define BCV_BCV_H
+
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -29,8 +32,6 @@
 #endif
 
 
-
-BUILD_MASK_HEADER;
 /*
 
  This class provides a numeric bit compressed vector. 
@@ -83,24 +84,9 @@ public:
     inline void mget(const size_t index, value_type_ptr data, size_t *actual) const;
 
     /*
-    This method is similar to mget(), however the number of elements extracted 
-    is limited externally, and not by the size of the block inside the compressed
-    vector.
-
-        @param size_t index
-        @param value_type_ptr data
-        @param size_t *limit The number of elements to extract, no range check is performed!!
-    */
-    inline void mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const;
-
-    inline void mget_fixed2(const size_t index, value_type_ptr data, size_t *limit) const;
-
-	/*
 	 *	Set method to set a value
 	 */
 	inline void set(const size_t index, const value_type v);
-
-    
 
 
     /*
@@ -185,37 +171,6 @@ private:
 
 };
 
-#define BRANCH_FREE_LT(x,y) (((x & ~y) | ((~(x ^ y)) & x - y)) >>  63)
-
-template<typename T, uint8_t B>
-void BitCompressedVector<T, B>::mget_fixed2(const size_t index, value_type_ptr data, size_t *limit) const
-{
-    // First get the initial values
-    data_t pos = _getPos(index);
-
-    // Base Mask, masks the lowest bits according to B
-    const data_t baseMask = global_bit_masks[B];    
-    
-    size_t upper = index + *limit;
-    size_t mempos = 0;
-    for(size_t counter = index; counter < upper; ++counter)
-    {
-        // Extract the value
-        data_t offset = buildMask(counter);
-        data[mempos] = (_data[pos] >> offset) & baseMask;
-
-        // base expression
-        size_t bounds = _width - offset;
-        data_t val = BRANCH_FREE_LT(bounds,B);
-        
-        // Reduce Branch
-        data[mempos++] |= val * ((_data[pos + 1] & global_bit_masks[B - bounds]) << bounds);
-
-        pos += val;
-    }
-}
-
-
 template<typename T, uint8_t B>
 void BitCompressedVector<T, B>::mget(const size_t index, value_type_ptr data, size_t *actual) const
 {
@@ -271,49 +226,6 @@ void BitCompressedVector<T, B>::mget(const size_t index, value_type_ptr data, si
 }
 
 template<typename T, uint8_t B>
-void BitCompressedVector<T, B>::mget_fixed(const size_t index, value_type_ptr data, size_t *limit) const
-{
-    // First get the initial values
-    data_t pos = _getPos(index);
-
-    // Running values for the loop
-    data_t currentValue;
-    data_t offset = _getOffset(index, pos * _width);
-    data_t bounds = _width - offset;
-
-    // Base Mask
-    const data_t baseMask = global_bit_masks[B];    
-    
-    // Align the block according to the offset
-    data_t block = _data[pos] >>  offset;    
-
-    size_t upper = *limit;
-    for(size_t counter = 0; counter < upper; ++counter)
-    {
-        // Extract the value
-        currentValue = (baseMask & block);
-
-        if (!(bounds > B))
-        {
-            offset = B - bounds;
-            block = _data[++pos];
-            currentValue |= (global_bit_masks[offset] & block) << bounds;
-
-            // Assign new block
-            block >>= offset;
-            bounds = _width - offset;            
-        } else 
-        {
-            bounds -= B;            
-            block >>= B;
-        }
-        
-        // Append current value
-        data[counter] = currentValue;
-    }
-}
-
-template<typename T, uint8_t B>
 void BitCompressedVector<T, B>::set(const size_t index, const value_type v)
 {
 	data_t pos = _getPos(index);
@@ -362,3 +274,5 @@ typename BitCompressedVector<T, B>::value_type BitCompressedVector<T, B>::get(co
 	} 
 	return result;
 }
+
+#endif // BCV_BCV_H

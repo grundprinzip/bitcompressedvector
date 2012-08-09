@@ -1,3 +1,6 @@
+#ifndef BCV_MASK_H
+#define BCV_MASK_H
+
 #include <stdint.h>
 
 template<int M>

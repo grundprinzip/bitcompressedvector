@@ -4,24 +4,26 @@ BUILD_DIR=build
 CC=g++
 CXXFLAGS= -g -mtune=native -mssse3 -msse4.1 
 
+FILES=main.cc test.cc
+
 all: gen
 	mkdir -p $(BUILD_DIR)
-	$(CC) -o $(BUILD_DIR)/main main.cpp $(CXXFLAGS) -g2
-	$(CC) -o $(BUILD_DIR)/main_opt main.cpp -DNDEBUG $(CXXFLAGS) -funroll-loops -O3
+	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2
+	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3
 
 gen:
 	cat mask_tpl.h > mask.h
 	python generate.py >> mask.h
 
 profile:
-	$(CC) -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
+	$(CC) -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./$(BUILD_DIR)/main_opt 100000000
 	pprof --pdf ./$(BUILD_DIR)/main_opt /tmp/bcv.prof > bcv.pdf
 
 papi:
-	g++ -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread
+	g++ -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread
 
-test:
+test: all
 	./$(BUILD_DIR)/main_opt 1000000
 	./$(BUILD_DIR)/main_opt 10000000
 	./$(BUILD_DIR)/main_opt 100000000

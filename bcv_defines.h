@@ -1,6 +1,8 @@
 #ifndef BCV_DEFINES_H
 #define BCV_DEFINES_H
 
+#include "mask.h"
+
 #define CACHE_LINE_SIZE 64
 
 #define BUILD_MASK_HEADER \
@@ -70,5 +72,7 @@
         CreateMask<62>::mask(), \
         CreateMask<63>::mask(), \
         CreateMask<64>::mask()}; \
+
+BUILD_MASK_HEADER;
 
 #endif // BCV_DEFINES_H

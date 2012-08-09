@@ -30,3 +30,4 @@ struct CreateMask<%d>
 
 
 print generate_create_mask(64)
+print "#endif //BCV_MASK_H"
