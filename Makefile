@@ -1,19 +1,20 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
-CXXFLAGS= -g2  -mtune=native -mssse3 -msse4.1 -funroll-loops
+CC=g++
+CXXFLAGS= -g -mtune=native -mssse3 -msse4.1 
 
 all: gen
 	mkdir -p $(BUILD_DIR)
-	g++ -o $(BUILD_DIR)/main main.cpp $(CXXFLAGS)
-	g++ -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG $(CXXFLAGS)
+	$(CC) -o $(BUILD_DIR)/main main.cpp $(CXXFLAGS) -g2
+	$(CC) -o $(BUILD_DIR)/main_opt main.cpp -DNDEBUG $(CXXFLAGS) -funroll-loops -O3
 
 gen:
 	cat mask_tpl.h > mask.h
 	python generate.py >> mask.h
 
 profile:
-	g++ -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG -lprofiler
+	$(CC) -O3 -o $(BUILD_DIR)/main_opt main.cpp -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./$(BUILD_DIR)/main_opt 100000000
 	pprof --pdf ./$(BUILD_DIR)/main_opt /tmp/bcv.prof > bcv.pdf
 

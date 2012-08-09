@@ -144,9 +144,6 @@ public:
     }
 
 
-    
-
-
 private:
 
 
@@ -195,9 +192,6 @@ void BitCompressedVector<T, B>::mget_fixed2(const size_t index, value_type_ptr d
 {
     // First get the initial values
     data_t pos = _getPos(index);
-
-    // Running values for the loop
-    data_t currentValue;
 
     // Base Mask, masks the lowest bits according to B
     const data_t baseMask = global_bit_masks[B];    
