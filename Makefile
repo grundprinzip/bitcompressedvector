@@ -24,9 +24,9 @@ papi:
 	g++ -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread
 
 test: all
-	./$(BUILD_DIR)/main_opt 1000000
-	./$(BUILD_DIR)/main_opt 10000000
-	./$(BUILD_DIR)/main_opt 100000000
+	./$(BUILD_DIR)/main 100000
+	./$(BUILD_DIR)/main 1000000
+	./$(BUILD_DIR)/main 10000000
 
 release: gen
 	$(RM) -Rf pkg/bcv
