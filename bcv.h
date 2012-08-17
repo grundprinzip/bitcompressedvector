@@ -23,7 +23,7 @@
 #ifndef NDEBUG
 
 #define DEBUG(msg) std::cout << msg << std::endl;
-#define DEBUG_M128(m) std::cout << (uint64_t) _mm_extract_epi64(m, 0) << "  " << (uint64_t) _mm_extract_epi64(m, 0) << std::endl;
+#define DEBUG_M128(m) std::cout << (uint64_t) _mm_extract_epi64(m, 0) << "  " << (uint64_t) _mm_extract_epi64(m, 1) << std::endl;
 
 #else
 
@@ -56,7 +56,7 @@ public:
     */
     BitCompressedVector(size_t size): _reserved(size)
     {       
-        _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 1;
+        _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
         posix_memalign((void**) &_data, 64, _allocated_blocks * sizeof(data_t));
         memset(_data, 0, _allocated_blocks * sizeof(data_t));
     }
@@ -169,6 +169,10 @@ private:
         return (index * B) % _width;
     }
 
+public:
+
+    data_t* getData(){ return _data; }
+
 };
 
 template<typename T, uint8_t B>
@@ -257,7 +261,12 @@ typename BitCompressedVector<T, B>::value_type BitCompressedVector<T, B>::get(co
     data_t mask;
 
     data_t pos = _getPos(index);
+
+    DEBUG(pos);
+
     data_t offset = _getOffset(index, pos * _width);
+
+    DEBUG(offset);
     data_t bounds = _width - offset; // This is almost static expression, that could be handled with a switch case
     
     mask = global_bit_masks[B];
