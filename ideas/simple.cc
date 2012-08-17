@@ -15,7 +15,7 @@
 #include "../bcv.h"
 
 #define BITS 5
-#define TUPLES 100
+#define TUPLES 1000000000
 
 //#define DEBUG_M128(m) std::cout << (uint64_t) _mm_extract_epi64(m, 0) << "  " << (uint64_t) _mm_extract_epi64(m, 1) << std::endl;
 
@@ -27,6 +27,8 @@
 
 int main(int argc, char* argv[])
 {
+
+  uint64_t some = 0;
 
     BitCompressedVector<int, BITS> v(TUPLES);
     fill<BitCompressedVector<int, BITS>, BITS>(v, TUPLES);
@@ -50,45 +52,54 @@ int main(int argc, char* argv[])
     // Offset used to where we are at
     int offset = 0;
 
+    const __m128i *data_moving = data;
+
+    Timer t;
+    t.start();
+
     while (counter < TUPLES)
     {
-        switch (offset)
-        {
-            case 0:
-            BitCompression<BITS>::decompress<0>(data + block, out);
-            offset = BitCompression<BITS>::next_offset<0>();
-            counter += BitCompression<BITS>::remaining<0>() + 1;
-            break;
-            case 1:
-            BitCompression<BITS>::decompress<1>(data + block, out);
-            offset = BitCompression<BITS>::next_offset<1>();
-            counter += BitCompression<BITS>::remaining<1>() + 1;
-            break;
-            case 2:
-            BitCompression<BITS>::decompress<2>(data + block, out);
-            offset = BitCompression<BITS>::next_offset<2>();
-            counter += BitCompression<BITS>::remaining<2>() + 1;
-            break;
-            case 3:
-            BitCompression<BITS>::decompress<3>(data + block, out);
-            offset = BitCompression<BITS>::next_offset<3>();
-            counter += BitCompression<BITS>::remaining<3>() + 1;
-            break;
-            case 4:
-            BitCompression<BITS>::decompress<4>(data + block, out);
-            offset = BitCompression<BITS>::next_offset<4>();
-            counter += BitCompression<BITS>::remaining<4>() + 1;
-            break;
-        }
-        break;
+      switch (offset)
+      {
+        case 0:
+          BitCompression<BITS>::decompress<0>(data_moving, out);
+          offset = BitCompression<BITS>::next_offset<0>();
+          counter += BitCompression<BITS>::remaining<0>() + 1;
+          break;
+        case 1:
+          BitCompression<BITS>::decompress<1>(data_moving, out);
+          offset = BitCompression<BITS>::next_offset<1>();
+          counter += BitCompression<BITS>::remaining<1>() + 1;
+          break;
+        case 2:
+          BitCompression<BITS>::decompress<2>(data_moving, out);
+          offset = BitCompression<BITS>::next_offset<2>();
+          counter += BitCompression<BITS>::remaining<2>() + 1;
+          break;
+        case 3:
+          BitCompression<BITS>::decompress<3>(data_moving, out);
+          offset = BitCompression<BITS>::next_offset<3>();
+          counter += BitCompression<BITS>::remaining<3>() + 1;
+          break;
+        case 4:
+          BitCompression<BITS>::decompress<4>(data_moving, out);
+          offset = BitCompression<BITS>::next_offset<4>();
+          counter += BitCompression<BITS>::remaining<4>() + 1;
+          break;
+      }
+
+        //some += *out;
+        ++data_moving;
     }
-    
-    std::cout << out[0] << " " 
-    << out[1] << " "
-    << out[2] << " "
-    << out[3] << std::endl;
 
+    t.stop();
+    std::cout << " get time " << ( t.elapsed_time()) << std::endl;
+    std::cout << some << std::endl;
 
+    // for(size_t i=0; i < TUPLES; ++i)
+    //   std::cout << out[i] << " ";
+
+    // std::cout << std::endl;
 
     
     // __m128i tmp;
