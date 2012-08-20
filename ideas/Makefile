@@ -1,5 +1,5 @@
 
-CXXFLAGS=-g -O3 -funroll-loops -msse4 -mtune=native 
+CXXFLAGS=-g -O3 -funroll-loops -msse4 -mtune=native -std=c++0x
 CC=g++
 
 all: simple.cc special.h
