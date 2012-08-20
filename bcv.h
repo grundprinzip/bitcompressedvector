@@ -57,7 +57,9 @@ public:
     BitCompressedVector(size_t size): _reserved(size)
     {       
         _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
-        posix_memalign((void**) &_data, 64, _allocated_blocks * sizeof(data_t));
+
+        //posix_memalign((void**) &_data, 64, _allocated_blocks * sizeof(data_t));
+        _data = (data_t*) malloc(_allocated_blocks * sizeof(data_t));
         memset(_data, 0, _allocated_blocks * sizeof(data_t));
     }
 
@@ -145,7 +147,7 @@ private:
     static const uint64_t _num_blocks = CACHE_LINE_SIZE / sizeof(data_t);
 
     // Pointer to the data
-    data_t *_data;
+    data_t *_data __attribute__((aligned(16))) ;
 
     size_t _reserved;
 

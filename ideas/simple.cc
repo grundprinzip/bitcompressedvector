@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
     const int out_size = TUPLES;
 
     // allocate and align memory
-    int *out = NULL;
-    posix_memalign((void**) &out, 64, out_size * sizeof(int));
+    int *out __attribute__((aligned(16))) = (int*) malloc(out_size * sizeof(int));
+    //posix_memalign((void**) &out, 64, out_size * sizeof(int));
     memset(out, 0, out_size * sizeof(int));
     
     // Main loop follows here
@@ -59,37 +59,54 @@ int main(int argc, char* argv[])
 
     while (counter < TUPLES)
     {
-      switch (offset)
-      {
-        case 0:
-          BitCompression<BITS>::decompress<0>(data_moving, out);
-          offset = BitCompression<BITS>::next_offset<0>();
-          counter += BitCompression<BITS>::remaining<0>() + 1;
-          break;
-        case 1:
-          BitCompression<BITS>::decompress<1>(data_moving, out);
-          offset = BitCompression<BITS>::next_offset<1>();
-          counter += BitCompression<BITS>::remaining<1>() + 1;
-          break;
-        case 2:
-          BitCompression<BITS>::decompress<2>(data_moving, out);
-          offset = BitCompression<BITS>::next_offset<2>();
-          counter += BitCompression<BITS>::remaining<2>() + 1;
-          break;
-        case 3:
-          BitCompression<BITS>::decompress<3>(data_moving, out);
-          offset = BitCompression<BITS>::next_offset<3>();
-          counter += BitCompression<BITS>::remaining<3>() + 1;
-          break;
-        case 4:
-          BitCompression<BITS>::decompress<4>(data_moving, out);
-          offset = BitCompression<BITS>::next_offset<4>();
-          counter += BitCompression<BITS>::remaining<4>() + 1;
-          break;
-      }
+                
+      BitCompression<BITS>::decompress<0>(data_moving++, out);
+      counter += BitCompression<BITS>::remaining<0>() + 1;
+
+      BitCompression<BITS>::decompress<2>(data_moving++, out);
+      counter += BitCompression<BITS>::remaining<2>() + 1;
+
+      BitCompression<BITS>::decompress<4>(data_moving++, out);
+      counter += BitCompression<BITS>::remaining<4>() + 1;
+
+      BitCompression<BITS>::decompress<1>(data_moving++, out);
+      counter += BitCompression<BITS>::remaining<1>() + 1;
+
+      BitCompression<BITS>::decompress<3>(data_moving++, out);
+      counter += BitCompression<BITS>::remaining<3>() + 1;
+
+
+      // switch (offset)
+      // {
+      //   case 0:
+      //     BitCompression<BITS>::decompress<0>(data_moving, out);
+      //     offset = BitCompression<BITS>::next_offset<0>();
+      //     counter += BitCompression<BITS>::remaining<0>() + 1;
+      //     break;
+      //   case 1:
+      //     BitCompression<BITS>::decompress<1>(data_moving, out);
+      //     offset = BitCompression<BITS>::next_offset<1>();
+      //     counter += BitCompression<BITS>::remaining<1>() + 1;
+      //     break;
+      //   case 2:
+      //     BitCompression<BITS>::decompress<2>(data_moving, out);
+      //     offset = BitCompression<BITS>::next_offset<2>();
+      //     counter += BitCompression<BITS>::remaining<2>() + 1;
+      //     break;
+      //   case 3:
+      //     BitCompression<BITS>::decompress<3>(data_moving, out);
+      //     offset = BitCompression<BITS>::next_offset<3>();
+      //     counter += BitCompression<BITS>::remaining<3>() + 1;
+      //     break;
+      //   case 4:
+      //     BitCompression<BITS>::decompress<4>(data_moving, out);
+      //     offset = BitCompression<BITS>::next_offset<4>();
+      //     counter += BitCompression<BITS>::remaining<4>() + 1;
+      //     break;
+      // }
 
         //some += *out;
-        ++data_moving;
+      //++data_moving;
     }
 
     t.stop();

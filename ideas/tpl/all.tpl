@@ -69,13 +69,13 @@ template<>
 template<>
 inline void BitCompression<<%bits%>>::overlap_value<<%offset%>>(const __m128i& data, int* output)
 {
-    static const __m128i shuffle_mask = {0x8080808003020100, 0x8080808080808080};
-    static const __m128i and_mask = {0x1f, 0x0};
-    __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
-    __m128i shift_right = _mm_srli_epi32(shuffeled, <%offset%>);
-    _mm_storeu_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
-    //int64_t v = _mm_extract_epi32(data, 0);
-    //*output = (v >> <%offset%>) & 0x1f;
+    // static const __m128i shuffle_mask = {0x8080808003020100, 0x8080808080808080};
+    // static const __m128i and_mask = {0x1f, 0x0};
+    // __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
+    // __m128i shift_right = _mm_srli_epi32(shuffeled, <%offset%>);
+    // _mm_storeu_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
+    int64_t v = _mm_extract_epi32(data, 0);
+    *output = (v >> <%offset%>) & 0x1f;
 }
 
 <%#extracts%>
@@ -88,12 +88,16 @@ inline void BitCompression<<%bits%>>::decompress_block<<%offset%>, <%block%>>(co
     static const __m128i and_mask = {<%and%>, <%and%>};
     static const int shift_mask = <%shift%>;
 
-    __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
-    __m128i shift_left = _mm_mullo_epi32(shuffeled, mull_mask);
-    __m128i shift_right = _mm_srli_epi32(shift_left, shift_mask);
+    register __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
+    shuffeled = _mm_mullo_epi32(shuffeled, mull_mask);
+    shuffeled = _mm_srli_epi32(shuffeled, shift_mask);    
+    _mm_store_si128((__m128i*) output, _mm_and_si128(shuffeled, and_mask));
+    
+    // register __m128i shift_left = _mm_mullo_epi32(shuffeled, mull_mask);
+    //register __m128i shift_right = _mm_srli_epi32(shift_left, shift_mask);
 
     // Always store aligned
-    _mm_store_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
+    //_mm_store_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
 
     // We should never store unaligned
     //_mm_storeu_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
@@ -113,16 +117,17 @@ template<>
 inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* block, int* out)
 {
     int *ctr = out;
-    const register __m128i qw_block = _mm_load_si128(block);;
+    const register __m128i qw_block = _mm_load_si128(block);
+
     <%#extracts%>
     BitCompression::decompress_block<<%offset%>, <%block%>>(qw_block, ctr);
     ctr += BitCompression::per_block<<%offset%>, <%block%>>();
 
     <%/extracts%>
 
-    // extract last element
+    // // extract last element
     __m128i tmp = _mm_alignr_epi8(_mm_load_si128(block + 1), qw_block,  <%base_shift%>);
-    BitCompression::overlap_value<<%offset%>>(tmp, ctr);    
+    BitCompression::overlap_value<<%offset%>>(tmp, ctr); 
 }
 
 
