@@ -11,6 +11,7 @@
 #include <stdexcept>
 
 #include "../Timer.h"
+#include "../PapiTracer.h"
 #include "../test.h"
 #include "../bcv.h"
 
@@ -54,8 +55,9 @@ int main(int argc, char* argv[])
 
     const __m128i *data_moving = data;
 
-    Timer t;
-    t.start();
+    //Timer t;
+    PapiTracer t;
+    int evt = t.start();
 
     while (counter < TUPLES)
     {
@@ -109,8 +111,9 @@ int main(int argc, char* argv[])
       //++data_moving;
     }
 
-    t.stop();
-    std::cout << " get time " << ( t.elapsed_time()) << std::endl;
+    PapiTracer::result_t res = t.stop(evt);
+    //std::cout << " get time " << ( t.elapsed_time()) << std::endl;
+    std::cout << res.first << " " << res.second << std::endl;
     std::cout << some << std::endl;
 
     // for(size_t i=0; i < TUPLES; ++i)

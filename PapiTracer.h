@@ -11,14 +11,10 @@ using namespace std;
 
 #ifdef USE_PAPI_TRACE
 
-#include <boost/interprocess/sync/named_mutex.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-
 #include <papi.h>
 #include <pthread.h>
 #include <stdexcept>
 
-using namespace boost::interprocess;
 #endif
 
 struct PapiTracer
@@ -36,18 +32,15 @@ struct PapiTracer
 #ifdef USE_PAPI_TRACE
 
 
-    //ovverride event settings
-    eventName = std::string(getenv("PAPI_EVENT"));
+        //ovverride event settings
+        //eventName = std::string(getenv("PAPI_EVENT"));
 
 	static bool initialized = false;
 
 	if(!initialized)
 	{
-		named_mutex mtx(open_or_create, "PAPI_MTX_INIT");
-		scoped_lock<named_mutex> lock(mtx);
 		if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
 			throw runtime_error("PAPI could not be initialized");
-
 		initialized = true;
 	}
         
