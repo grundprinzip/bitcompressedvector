@@ -48,28 +48,26 @@ void performance(size_t size)
 
 
     ///////////////////////////////////////////////////////////////////////////
-    // res = 0;
-    // size_t alloca = ((64 / BITS)+1) * 8;
-    // int *tmp = (int*) malloc(sizeof(int) * alloca);
+    res = 0;
+    size_t alloca = 1000;
+    int *tmp = (int*) malloc(sizeof(int) * alloca);
 
-    // size_t actual;
-    // t.start();
-    // //int flags = PapiTracer::start();
-    // for(size_t i=0; i < size; )       
-    // {
-    //     actual = 0;
-    //     v.mget(i, tmp, &actual);
-    //     for(size_t j=0; j < actual; ++j)
-    //         res += tmp[j];
+    size_t actual;
+    t.start();
+    for(size_t i=0; i < size; )       
+    {
+        actual = 0;
+        v.mget(i, tmp, &actual);
+        //for(size_t j=0; j < actual & i < size; ++j)
+        res += tmp[0];
         
-    //     i += actual;
+        i += actual;
 
-    // }
-    // //PapiTracer::result_t papi = PapiTracer::stop(flags);
-    // t.stop();
-    // std::cout << res << " mget time " << (c = t.elapsed_time()) << std::endl;
-    // //std::cout << papi.first << " " << papi.second << std::endl;
-    // free(tmp);
+    }
+    t.stop();
+    std::cout << res << " mget time " << (c = t.elapsed_time()) << std::endl;
+    //std::cout << papi.first << " " << papi.second << std::endl;
+    free(tmp);
 
     
     ///////////////////////////////////////////////////////////////////////////

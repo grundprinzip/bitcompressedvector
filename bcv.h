@@ -29,6 +29,8 @@
 
 #endif
 
+#include <assert.h>
+#include "decompress.h"
 
 /*
 
@@ -150,9 +152,9 @@ private:
     size_t _allocated_blocks;
 
     // get the position of an index inside the list of data values
-    inline size_t _getPos(size_t index) const
+    inline size_t _getPos(size_t index, size_t width=_width) const
     {
-        return (index * B) / _width;
+        return (index * B) / width;
     }
 
     // get the offset of an index inside a block
@@ -222,6 +224,13 @@ typename BitCompressedVector<T, B>::value_type BitCompressedVector<T, B>::get(co
         result |= (mask & _data[pos + 1]) << bounds;
     }
     return result;
+}
+
+template<typename T, uint64_t B>
+void BitCompressedVector<T, B>::mget(const size_t index, value_type_ptr data, size_t *actual) const
+{
+    //assert(128 % index == 0);
+    BitCompression<B>::decompress_large(((const __m128i*) _data) + _getPos(index, 128), data, actual);
 }
 
 #endif // BCV_BCV_H

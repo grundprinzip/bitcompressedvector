@@ -69,7 +69,7 @@ def build_mask(index_in_vector, bits, elements, offset):
 all_data = {}
 all_data["bits"] = []
 
-for bits in range(1, 27):
+for bits in range(5, 6):
 
     bit_elements = {}
     bit_elements["data"] = []
@@ -114,6 +114,7 @@ for bits in range(1, 27):
         element_data["overlap_shift"] = (elements * bits) % 8 + offset
         element_data["overlap_mask"] = hex(2**bits -1)
         element_data["extracts"] = []
+        element_data["add_next"] = True if next_offset != 0 else False
     
         # Generate the shuffle masks for extracting from one single 16 byte register 
         # without offset

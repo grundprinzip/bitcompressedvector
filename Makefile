@@ -6,7 +6,7 @@ CXXFLAGS= -mtune=native -mssse3 -msse4.1 -m64
 
 FILES=main.cc test.cc
 
-all: 
+all: gen
 	mkdir -p $(BUILD_DIR)
 	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
 	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g
@@ -15,6 +15,11 @@ profile:
 	$(CC) -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./$(BUILD_DIR)/main_opt 100000000
 	pprof --pdf ./$(BUILD_DIR)/main_opt /tmp/bcv.prof > bcv.pdf
+
+gen: decompress.h 
+
+decompress.h: tpl/all.tpl code_gen.py 
+	python code_gen.py > decompress.h
 
 papi:
 	g++ -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread

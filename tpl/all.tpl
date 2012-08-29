@@ -35,7 +35,7 @@ public:
     template<int offset>
     inline static void decompress(const __m128i* data, int* out);
 
-    inline static void decompress_large(const __m128i* data, int* out, int* counter_out);
+    inline static void decompress_large(const __m128i* data, int* out, size_t* counter_out);
 };
 
 <%#bits%>
@@ -117,22 +117,24 @@ inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* bloc
 
     <%/extracts%>
 
+    <%#add_next%>
     // // extract last element
     __m128i tmp = _mm_alignr_epi8(_mm_load_si128(block + 1), qw_block,  <%base_shift%>);
     BitCompression::overlap_value<<%offset%>>(tmp, ctr); 
+    <%/add_next%>
 }
 
 
 <%/data%>
 template<>
-inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int* out, int* counter_out) 
+inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int* out, size_t* counter_out) 
 { 
-    int tmp_counter = 0;
+    size_t tmp_counter = 0;
 
     const __m128i *data_moving = data;
     <%#data%>
     BitCompression<<%bits%>>::decompress<<%offset%>>(data_moving++, out + tmp_counter);
-    tmp_counter += BitCompression<<%bits%>>::remaining<<%offset%>>() + 1;
+    tmp_counter += BitCompression<<%bits%>>::remaining<<%offset%>>() <%#add_next%> + 1 <%/add_next%>;
 
     <%/data%>
     *counter_out = tmp_counter;
