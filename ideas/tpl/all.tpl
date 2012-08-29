@@ -34,7 +34,11 @@ public:
 
     template<int offset>
     inline static void decompress(const __m128i* data, int* out);
+
+    inline static void decompress_large(const __m128i* data, int* out, int* counter_out);
 };
+
+<%#bits%>
 
 
 
@@ -69,13 +73,8 @@ template<>
 template<>
 inline void BitCompression<<%bits%>>::overlap_value<<%offset%>>(const __m128i& data, int* output)
 {
-    // static const __m128i shuffle_mask = {0x8080808003020100, 0x8080808080808080};
-    // static const __m128i and_mask = {0x1f, 0x0};
-    // __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
-    // __m128i shift_right = _mm_srli_epi32(shuffeled, <%offset%>);
-    // _mm_storeu_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
     int64_t v = _mm_extract_epi32(data, 0);
-    *output = (v >> <%offset%>) & 0x1f;
+    *output = (v >> <%overlap_shift%>) & <%overlap_mask%>;
 }
 
 <%#extracts%>
@@ -91,16 +90,9 @@ inline void BitCompression<<%bits%>>::decompress_block<<%offset%>, <%block%>>(co
     register __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);
     shuffeled = _mm_mullo_epi32(shuffeled, mull_mask);
     shuffeled = _mm_srli_epi32(shuffeled, shift_mask);    
-    _mm_store_si128((__m128i*) output, _mm_and_si128(shuffeled, and_mask));
     
-    // register __m128i shift_left = _mm_mullo_epi32(shuffeled, mull_mask);
-    //register __m128i shift_right = _mm_srli_epi32(shift_left, shift_mask);
-
-    // Always store aligned
-    //_mm_store_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
-
-    // We should never store unaligned
-    //_mm_storeu_si128((__m128i*) output, _mm_and_si128(shift_right, and_mask));
+    //_mm_store_si128((__m128i*) output, _mm_and_si128(shuffeled, and_mask));
+    _mm_storeu_si128((__m128i*) output, _mm_and_si128(shuffeled, and_mask));
 }
 
 template<>
@@ -132,3 +124,18 @@ inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* bloc
 
 
 <%/data%>
+template<>
+inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int* out, int* counter_out) 
+{ 
+    int tmp_counter = 0;
+
+    const __m128i *data_moving = data;
+    <%#data%>
+    BitCompression<<%bits%>>::decompress<<%offset%>>(data_moving++, out + tmp_counter);
+    tmp_counter += BitCompression<<%bits%>>::remaining<<%offset%>>() + 1;
+
+    <%/data%>
+    *counter_out = tmp_counter;
+}
+
+<%/bits%>

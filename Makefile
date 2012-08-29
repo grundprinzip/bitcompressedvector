@@ -2,18 +2,14 @@ SHELL = /bin/bash
 BUILD_DIR=build
 
 CC=g++
-CXXFLAGS= -g -mtune=native -mssse3 -msse4.1 
+CXXFLAGS= -mtune=native -mssse3 -msse4.1 -m64
 
 FILES=main.cc test.cc
 
-all: gen
+all: 
 	mkdir -p $(BUILD_DIR)
-	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2
-	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3
-
-gen:
-	cat mask_tpl.h > mask.h
-	python generate.py >> mask.h
+	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
+	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g
 
 profile:
 	$(CC) -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
@@ -24,9 +20,9 @@ papi:
 	g++ -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread
 
 test: all
-	./$(BUILD_DIR)/main 100000
-	./$(BUILD_DIR)/main 1000000
-	./$(BUILD_DIR)/main 10000000
+	./$(BUILD_DIR)/main 1000
+	#./$(BUILD_DIR)/main 1000000
+	#./$(BUILD_DIR)/main 10000000
 
 release: gen
 	$(RM) -Rf pkg/bcv

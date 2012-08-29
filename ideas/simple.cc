@@ -16,7 +16,7 @@
 #include "../bcv.h"
 
 #define BITS 5
-#define TUPLES 1000000000
+#define TUPLES 100
 
 //#define DEBUG_M128(m) std::cout << (uint64_t) _mm_extract_epi64(m, 0) << "  " << (uint64_t) _mm_extract_epi64(m, 1) << std::endl;
 
@@ -59,24 +59,24 @@ int main(int argc, char* argv[])
     PapiTracer t;
     int evt = t.start();
 
+    int bufcounter = 0;
+
     while (counter < TUPLES)
     {
                 
-      BitCompression<BITS>::decompress<0>(data_moving++, out);
-      counter += BitCompression<BITS>::remaining<0>() + 1;
+      BitCompression<BITS>::decompress_large(data_moving, out, &bufcounter);
+      //counter += bufcounter;
 
-      BitCompression<BITS>::decompress<2>(data_moving++, out);
-      counter += BitCompression<BITS>::remaining<2>() + 1;
+      for(size_t i=0; i < bufcounter; ++i)
+      {
+        if (counter++ < TUPLES)
 
-      BitCompression<BITS>::decompress<4>(data_moving++, out);
-      counter += BitCompression<BITS>::remaining<4>() + 1;
+          std::cout << out[i] << std::endl;
+      }
 
-      BitCompression<BITS>::decompress<1>(data_moving++, out);
-      counter += BitCompression<BITS>::remaining<1>() + 1;
+      std::cout << "---" << std::endl;
 
-      BitCompression<BITS>::decompress<3>(data_moving++, out);
-      counter += BitCompression<BITS>::remaining<3>() + 1;
-
+      break;
 
       // switch (offset)
       // {
