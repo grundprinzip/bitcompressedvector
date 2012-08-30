@@ -25,7 +25,7 @@ void performance(size_t size)
 
     Timer t;
     long long res = 0;
-
+    std::cout << "# BITS res get res get[] res mget res vector" << std::endl;
     ///////////////////////////////////////////////////////////////////////////
     t.start();
     for(size_t i=0; i < size; i+=1)  
@@ -33,7 +33,7 @@ void performance(size_t size)
         res += v.get(i);                
     }
     t.stop();
-    std::cout << res << " get time " << (a = t.elapsed_time()) << std::endl;
+    std::cout << BITS << " " << res << " " << (a = t.elapsed_time());
 
     ///////////////////////////////////////////////////////////////////////////
     res = 0;
@@ -43,7 +43,7 @@ void performance(size_t size)
         res += v[i];                
     }
     t.stop();
-    std::cout << res << " get[] time " << (b = t.elapsed_time()) << std::endl;
+    std::cout << " " << res << " " << (b = t.elapsed_time()) << " ";
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void performance(size_t size)
 
     }
     t.stop();
-    std::cout << res << " mget time " << (c = t.elapsed_time()) << std::endl;
+    std::cout << res << " " << (c = t.elapsed_time()) << " ";
     //std::cout << papi.first << " " << papi.second << std::endl;
     free(tmp);
 
@@ -92,7 +92,7 @@ void performance(size_t size)
         res += v2[i+15];
     }
     t.stop();
-    std::cout << res << " vector time " << (e = t.elapsed_time()) << std::endl;
+    std::cout << res << " " << (e = t.elapsed_time()) << std::endl;
 }
 
 
