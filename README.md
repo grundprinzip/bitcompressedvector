@@ -8,10 +8,18 @@ the width of value has to be specified.
 The goal is to achieve a good compression ratio by keeping up with the
 sequential scan speed of a std::vector.
 
+This work is largely based on the algorithms presented by Wilhalm et al "SIMD-
+Scan: Ultra Fast in-Memory Table Scan using on-Chip Vector Processing Units"
+published in PVLDB 2(1): 385-394 (2009).
+
+![Bit Dependency](grundprinzip.github.com/bitcompressedvector/images/initial.png)
+
 
 ## Usage
 
-The BCV is intended to be a drop-in replacement of ``std::vector``, however, currently it is only of fixed size and does not support any kind of iterator interface. The access methods to the vector are:
+The BCV is intended to be a drop-in replacement of ``std::vector``, however,
+currently  it is only of fixed size and does not support any kind of iterator
+interface.  The access methods to the vector are:
 
   1. Index-based subscript
   1. Index-based ``get``/``set()``
@@ -25,15 +33,19 @@ The multi-get method allows to extract multiple values at once. Here we
 differentiate between to versions of the ``mget()`` the first amget will
 extract one cache line of compressed values and write them out to a external
 storage array. The second version ``mget_fixed()`` will only extract one cache
-line of uncompressed values and write them to the external storage. It is important to mention that ``mget_fixed()`` will not perform any range checks on the data, so make sure you extract the right amount of data.
+line of uncompressed values and write them to the external storage. It is
+important to mention that ``mget_fixed()`` will not perform any range checks
+on the data, so make sure you extract the right amount of data.
 
 ## Adding to your Project
 
-To increase the performance of the bit-compressed vector some parts of the bit mask lookups are generated so you have to run
+To increase the performance of the bit-compressed vector some parts of the bit
+mask lookups are generated so you have to run
 
 	make release
 
-before continuing. Now you can copy everything from pkg/bcv to your project and use it as is. 
+before continuing. Now you can copy everything from pkg/bcv to your project
+and use it as is.
 
 
 ## Performance Numbers
@@ -44,14 +56,13 @@ for sequential scans but allowing to save a significant amount of memory
 For a vector with 100M elements the sequential scan speed is on a Intel Xeon
 7560 and 5 bits stored for 32 bit integers a scan aggregating all values takes:
 
-  * get time ``0.329251``s
-  * get[] time ``0.329185``s
-  * mget time ``0.276978``s
-  * mget fixed time ``0.168968``s
-  * vector time ``0.191044``s
+  * get time ``0.268859``s
+  * mget time ``0.095577``s
+  * vector time ``0.133813``s
 
 The memory consumption for the vector is ~ 400MB and for the bit compressed
 vector ~ 60MB.
+
 
 
 ## Licence 
