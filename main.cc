@@ -8,12 +8,11 @@
 #include <iostream>
 #include <vector>
 
-#define BITS 5ull
-
 #include <emmintrin.h>
 #include <tmmintrin.h>
 #include <smmintrin.h>
 
+template<int BITS>
 void performance(size_t size)
 {
     BitCompressedVector<int, BITS> v(size);
@@ -107,7 +106,38 @@ int main(int argc, char* argv[])
     runTests();
     #endif
 
-    performance(SIZE);
+    performance<1>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<2>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<3>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<4>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<5>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<6>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<7>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<8>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<9>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<10>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<11>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<12>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<13>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<14>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<15>(SIZE);
+    std::cout << "#---" << std::endl;
+    performance<16>(SIZE);
+    std::cout << "#---" << std::endl;
 
 	return 0;
 }

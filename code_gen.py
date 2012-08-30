@@ -69,7 +69,7 @@ def build_mask(index_in_vector, bits, elements, offset):
 all_data = {}
 all_data["bits"] = []
 
-for bits in range(5, 6):
+for bits in range(1,27):
 
     bit_elements = {}
     bit_elements["data"] = []
