@@ -12,7 +12,7 @@ This work is largely based on the algorithms presented by Wilhalm et al "SIMD-
 Scan: Ultra Fast in-Memory Table Scan using on-Chip Vector Processing Units"
 published in PVLDB 2(1): 385-394 (2009).
 
-![Bit Dependency](grundprinzip.github.com/bitcompressedvector/images/initial.png)
+![Bit Dependency](https://raw.github.com/grundprinzip/bitcompressedvector/master/images/initial.png)
 
 
 ## Usage
