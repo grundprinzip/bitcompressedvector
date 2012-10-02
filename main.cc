@@ -58,23 +58,8 @@ void performance(size_t size)
     {
         actual = 0;
         v.mget(i, tmp, &actual);
-        //for(size_t j=0; j < actual & i < size; ++j)
-        res += tmp[0];
-        i += actual;
-
-        v.mget(i, tmp, &actual);
-        //for(size_t j=0; j < actual & i < size; ++j)
-        res += tmp[0];
-        i += actual;
-
-        v.mget(i, tmp, &actual);
-        //for(size_t j=0; j < actual & i < size; ++j)
-        res += tmp[0];
-        i += actual;
-
-        v.mget(i, tmp, &actual);
-        //for(size_t j=0; j < actual & i < size; ++j)
-        res += tmp[0];
+        for(size_t j=0; j < actual & i < size; ++j)
+            res += tmp[j];
         i += actual;
 
     }
@@ -96,22 +81,26 @@ void performance(size_t size)
         actual = 0;
         
         VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        res += tmp[0];
+        for(size_t j=0; j < actual & i < size; ++j)
+            res += tmp[j];
         i += actual;        
         ++data;
 
         VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        res += tmp[0];
+        for(size_t j=0; j < actual & i < size; ++j)
+            res += tmp[j];
         i += actual;        
         ++data;
 
         VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        res += tmp[0];
+        for(size_t j=0; j < actual & i < size; ++j)
+            res += tmp[j];
         i += actual;        
         ++data;
 
         VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        res += tmp[0];
+        for(size_t j=0; j < actual & i < size; ++j)
+            res += tmp[j];
         i += actual;        
         ++data;
 

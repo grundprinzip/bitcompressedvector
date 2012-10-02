@@ -16,10 +16,13 @@ profile:
 	CPUPROFILE_FREQUENCY=1000 CPUPROFILE=/tmp/bcv.prof ./$(BUILD_DIR)/main_opt 100000000
 	pprof --pdf ./$(BUILD_DIR)/main_opt /tmp/bcv.prof > bcv.pdf
 
-gen: decompress.h 
+gen: decompress.h decompress2.h
 
 decompress.h: tpl/all.tpl code_gen.py 
 	python code_gen.py > decompress.h
+
+decompress2.h: tpl/vertical.tpl code_gen_vertical.py
+	python code_gen_vertical.py > decompress2.h
 
 papi:
 	g++ -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lpapi -DUSE_PAPI_TRACE -lpthread

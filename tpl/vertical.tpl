@@ -1,4 +1,6 @@
 {{=<% %>=}}
+#ifndef BCV_VERTICAL_BIT_COMPRESSION
+#define BCV_VERTICAL_BIT_COMPRESSION
 
 // SSE requirements
 #include <emmintrin.h>
@@ -61,3 +63,5 @@ inline void VerticalBitCompression<<%bits%>>::decompress(const __m128i* data, in
 }
 
 <%/bits%>
+
+#endif
