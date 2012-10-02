@@ -1,0 +1,18 @@
+Horizontal vs Vertical Bit Packing for In-Memory Column Stores
+
+
+* Show implementation of vertical and horizontal bit packing
+* compare advantages of each implementation
+
+* benchmark bit cases
+
+
+* Random Access
+* Full Sequntial Scan
+* Scan with different increasing selectivity
+
+
+
+* Propose mechanism to automatically choose the right bit packing algorithm
+	* probably workload dependent
+	* can we deduce an optimum that is independent of the workload and only dependent on the bit case
