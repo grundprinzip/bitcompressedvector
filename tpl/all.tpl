@@ -27,15 +27,15 @@ public:
     inline static int block_count();
 
     template<int offset>
-    inline static void overlap_value(const __m128i& data, int* output);
+    inline static void overlap_value(const __m128i& data, int* __restrict__ output);
 
     template<int offset, int block>
     inline static int per_block();
 
     template<int offset>
-    inline static void decompress(const __m128i* data, int* out);
+    inline static void decompress(const __m128i* data, int* __restrict__ out);
 
-    inline static void decompress_large(const __m128i* data, int* out, size_t* counter_out);
+    inline static void decompress_large(const __m128i* data, int* __restrict__ out, size_t* __restrict__ counter_out);
 };
 
 <%#bits%>
@@ -71,7 +71,7 @@ inline int BitCompression<<%bits%>>::block_count<<%offset%>>() { return <%num_ex
 // Extract the last value which overlaps from the m128 register
 template<>
 template<>
-inline void BitCompression<<%bits%>>::overlap_value<<%offset%>>(const __m128i& data, int* output)
+inline void BitCompression<<%bits%>>::overlap_value<<%offset%>>(const __m128i& data, int* __restrict__ output)
 {
     int64_t v = _mm_extract_epi32(data, 0);
     *output = (v >> <%overlap_shift%>) & <%overlap_mask%>;
@@ -80,7 +80,7 @@ inline void BitCompression<<%bits%>>::overlap_value<<%offset%>>(const __m128i& d
 <%#extracts%>
 template<>
 template<>
-inline void BitCompression<<%bits%>>::decompress_block<<%offset%>, <%block%>>(const __m128i& data, int* output)
+inline void BitCompression<<%bits%>>::decompress_block<<%offset%>, <%block%>>(const __m128i& data, int* __restrict__ output)
 {
     static const __m128i shuffle_mask = <%shuffle%>;
     static const __m128i mull_mask = <%mullo%>;
@@ -106,7 +106,7 @@ inline int BitCompression<<%bits%>>::per_block<<%offset%>, <%block%>>()
 
 template<>
 template<>
-inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* block, int* out)
+inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* block, int* __restrict__ out)
 {
     int *ctr = out;
     const register __m128i qw_block = _mm_load_si128(block);
@@ -127,7 +127,7 @@ inline void BitCompression<<%bits%>>::decompress<<%offset%>>(const __m128i* bloc
 
 <%/data%>
 template<>
-inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int* out, size_t* counter_out) 
+inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int* out, size_t* __restrict__ counter_out) 
 { 
     size_t tmp_counter = 0;
 

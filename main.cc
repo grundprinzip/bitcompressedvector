@@ -1,4 +1,5 @@
 #include "bcv.h"
+#include "decompress2.h"
 #include "test.h"
 #include "Timer.h"
 #include "PapiTracer.h"
@@ -68,6 +69,44 @@ void performance(size_t size)
     //std::cout << papi.first << " " << papi.second << std::endl;
     free(tmp);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // VErtical
+    res = 0;
+    alloca = 1000;
+    tmp = (int*) malloc(sizeof(int) * alloca);
+
+    __m128i *data = reinterpret_cast<__m128i*>(v.getData()); 
+    t.start();
+    for(size_t i=0; i < size; )       
+    {
+        actual = 0;
+        
+        VerticalBitCompression<4>::decompress(data, tmp, &actual);
+        res += tmp[0];
+        i += actual;        
+        ++data;
+
+        VerticalBitCompression<4>::decompress(data, tmp, &actual);
+        res += tmp[0];
+        i += actual;        
+        ++data;
+
+        VerticalBitCompression<4>::decompress(data, tmp, &actual);
+        res += tmp[0];
+        i += actual;        
+        ++data;
+
+        VerticalBitCompression<4>::decompress(data, tmp, &actual);
+        res += tmp[0];
+        i += actual;        
+        ++data;
+
+    }
+    t.stop();
+    std::cout << res << " " << (c = t.elapsed_time()) << " ";
+    //std::cout << papi.first << " " << papi.second << std::endl;
+    free(tmp);
+
     
     ///////////////////////////////////////////////////////////////////////////
     res = 0;
@@ -106,36 +145,36 @@ int main(int argc, char* argv[])
     runTests();
     #endif
 
-    performance<1>(SIZE);
-    std::cout << "#---" << std::endl;
+    // performance<1>(SIZE);
+    // std::cout << "#---" << std::endl;
     performance<2>(SIZE);
     std::cout << "#---" << std::endl;
-    performance<3>(SIZE);
-    std::cout << "#---" << std::endl;
+    // performance<3>(SIZE);
+    // std::cout << "#---" << std::endl;
     performance<4>(SIZE);
     std::cout << "#---" << std::endl;
-    performance<5>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<6>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<7>(SIZE);
-    std::cout << "#---" << std::endl;
+    // performance<5>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<6>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<7>(SIZE);
+    // std::cout << "#---" << std::endl;
     performance<8>(SIZE);
     std::cout << "#---" << std::endl;
-    performance<9>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<10>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<11>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<12>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<13>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<14>(SIZE);
-    std::cout << "#---" << std::endl;
-    performance<15>(SIZE);
-    std::cout << "#---" << std::endl;
+    // performance<9>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<10>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<11>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<12>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<13>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<14>(SIZE);
+    // std::cout << "#---" << std::endl;
+    // performance<15>(SIZE);
+    // std::cout << "#---" << std::endl;
     performance<16>(SIZE);
     std::cout << "#---" << std::endl;
 
