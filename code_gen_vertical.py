@@ -39,7 +39,7 @@ def generate_vertical(bits, type_width, size):
 	mask = (1 << bits) - 1
 
 	# Start the outer loop
-	all_data["extracts"] = []
+	data["extracts"] = []
 	for i in range(extractions/elements_per_cycle):
 
 		extract = {}
@@ -48,18 +48,18 @@ def generate_vertical(bits, type_width, size):
 		extract["use_shift"] = extract["shift"] > 0
 		extract["no_shift"] = extract["shift"] == 0
 				
-		all_data["extracts"].append(extract)
+		data["extracts"].append(extract)
 
 	# In the end we need to check if there is an overlap
-	if len(all_data["extracts"]) * elements_per_cycle * bits < size:
-		all_data["has_overlap"] = {}
+	if len(data["extracts"]) * elements_per_cycle * bits < size:
+		data["has_overlap"] = {}
 
 		base_value = extractions/elements_per_cycle * bits
 		mask = ((1 << (bits - (type_width - base_value))) - 1) << type_width - base_value
 
-		all_data["has_overlap"]["and_mask"] = build_128bit_val(mask, mask, mask, mask)
-		all_data["has_overlap"]["shift"] = base_value
-		all_data["has_overlap"]["shift_left"] = bits - (type_width - base_value)
+		data["has_overlap"]["and_mask"] = build_128bit_val(mask, mask, mask, mask)
+		data["has_overlap"]["shift"] = base_value
+		data["has_overlap"]["shift_left"] = bits - (type_width - base_value)
 
 
 	return data
