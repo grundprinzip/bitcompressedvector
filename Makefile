@@ -1,8 +1,8 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
-CC=g++
-CXXFLAGS= -mtune=native -mssse3 -msse4.1 -m64
+CC=/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
+CXXFLAGS= -mtune=native -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
 
 FILES=main.cc test.cc
 

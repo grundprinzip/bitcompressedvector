@@ -2,7 +2,7 @@ import fractions
 import math
 import pystache
 
-renderer = pystache.Renderer(search_dirs="tpl")
+renderer = pystache.Renderer(search_dirs="tpl", escape=lambda u: u)
 
 def format(val):
     if val > 15:
@@ -128,19 +128,19 @@ for bits in range(1,27):
             extracts_data["elements"] = elements
             extracts_data["block_elements"] = 0
     
-            val = "{0x"
+            val = "{static_cast<long long int>(0x"
     
             for cnt in [i*4+1, i*4]:
                 val += build_mask(cnt, bits, elements, offset)
                 extracts_data["block_elements"] += 1 if cnt < elements else 0
     
     
-            val += ", 0x"
+            val += "ull), static_cast<long long int>(0x"
             for cnt in [i*4+3, i*4 + 2]:
                 val += build_mask(cnt, bits, elements, offset)
                 extracts_data["block_elements"] += 1 if cnt < elements else 0
     
-            val += "}"
+            val += "ull)}"
         
             #print val
             extracts_data["shuffle"] = val
@@ -162,12 +162,12 @@ for bits in range(1,27):
             mullo = [2**(max_invalid_bits - k) for k in all_offsets]
             
             # Generate buffers of m128i
-            buf = "{"
+            buf = "{static_cast<long long int>("
             val = (mullo[1] << 32) + mullo[0]
-            buf += str(hex(val)) + ", "
+            buf += str(hex(val)) + "ull), static_cast<long long int>("
     
             val = (mullo[3] << 32) + mullo[2]
-            buf += str(hex(val)) + "}"
+            buf += str(hex(val)) + "ull)}"
     
             #print buf
             extracts_data["mullo"] = buf

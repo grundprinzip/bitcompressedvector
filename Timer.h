@@ -34,7 +34,7 @@ private:
 public:
 	// 'running' is initially false.  A timer needs to be explicitly started
 	// using 'start' or 'restart'
-	Timer() : running(false) { }
+	Timer() : running(false), startTime(), endTime() { }
 
 	void start(const char* msg = 0);
 	void stop(const char* msg = 0);

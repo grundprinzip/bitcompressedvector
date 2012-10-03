@@ -84,7 +84,7 @@ inline void BitCompression<<%bits%>>::decompress_block<<%offset%>, <%block%>>(co
 {
     static const __m128i shuffle_mask = <%shuffle%>;
     static const __m128i mull_mask = <%mullo%>;
-    static const __m128i and_mask = {<%and%>, <%and%>};
+    static const __m128i and_mask = {static_cast<long long int>(<%and%>ull), static_cast<long long int>(<%and%>ull)};
     static const int shift_mask = <%shift%>;
 
     register __m128i shuffeled = _mm_shuffle_epi8(data, shuffle_mask);

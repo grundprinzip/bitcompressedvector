@@ -55,17 +55,26 @@ public:
     /*
     * Constructor
     */
-    BitCompressedVector(size_t size): _reserved(size)
+    explicit BitCompressedVector(size_t size): _reserved(size), _data(0), _allocated_blocks(0)
     {       
         _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
         posix_memalign((void**) &_data, 16, _allocated_blocks * sizeof(data_t));
         memset(_data, 0, _allocated_blocks * sizeof(data_t));
     }
 
+    /* Deleted assignemnt and copy constructor */
+    BitCompressedVector(BitCompressedVector& other) = delete;
+
+    /* Deleted assignemnt and copy constructor */
+    BitCompressedVector& operator=(const BitCompressedVector& other) = delete;
+
+    /* Destructor */
     ~BitCompressedVector()
     {
         free(_data);
     }
+
+
 
     /*
      *  Original get method based on the index
@@ -133,15 +142,9 @@ public:
 
 private:
 
-
-    typedef uint8_t byte;
     // data type
     typedef uint64_t data_t;
     
-    // function pointer helper
-    typedef data_t (*mask_fun_ptr)(void);
-
-
     // Width determines the number of bits used to encode the block data type
     static const uint8_t _width = sizeof(data_t) * 8;
 
@@ -237,6 +240,154 @@ void BitCompressedVector<T, B, Horizontal>::mget(const size_t index, value_type_
 {
     //assert(128 % index == 0);
     BitCompression<B>::decompress_large(((const __m128i*) _data) + _getPos(index, 128), data, actual);
+}
+
+
+/**************************************************************************************************************/
+
+template<typename T, uint64_t B>
+class BitCompressedVectorVertical
+{
+    
+public:
+
+    typedef T   value_type;
+    typedef T&  value_type_ref;
+    typedef T*  value_type_ptr;
+
+
+    /*
+    * Constructor
+    */
+    BitCompressedVectorVertical(size_t size): _reserved(size)
+    {       
+        _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
+        posix_memalign((void**) &_data, 16, _allocated_blocks * sizeof(data_t));
+        memset(_data, 0, _allocated_blocks * sizeof(data_t));
+    }
+
+    ~BitCompressedVectorVertical()
+    {
+        free(_data);
+    }
+
+    /*
+     *  Original get method based on the index
+     */
+    inline value_type get(const size_t index) const;
+
+
+    /* 
+
+    This method returns a list of extracted values from the vector.The number
+    of elements is variadic end depends on the number of elements inside a
+    single block.
+
+    Typicallay we try to extract at least a single cache line
+
+     */
+    inline void mget(const size_t index, value_type_ptr data, size_t __restrict__ *actual) const;
+
+    /*
+     *  Set method to set a value
+     */
+    inline void set(const size_t index, const value_type v);
+
+
+    /*
+        This small class is a simple proxy class that let's us handle reference 
+        values to indizes in the bitvector without actually having a direct reference
+    */
+    struct BitVectorProxy
+    {
+        size_t _index;
+        BitCompressedVectorVertical<T, B> *_vector;
+
+        BitVectorProxy(size_t idx, BitCompressedVectorVertical<T, B> *v): _index(idx), _vector(v)
+        {}
+
+        // Implicit conversion operator used for rvalues of T
+        inline operator const T () const 
+        {
+            return _vector->get(_index);
+        }
+
+        // Usins the Proxy to set the value using the subscript as an lvalue
+        inline BitVectorProxy& operator= (const T& rvalue)
+        {
+            _vector->set(_index, rvalue);
+            return *this;
+        }
+
+    };
+
+    /*
+     * Shortcut method for get(size_t index)
+     */
+    inline const BitVectorProxy operator[] (const size_t index) const
+    {
+        return BitVectorProxy(index, this);
+    }
+
+    inline BitVectorProxy operator[] (const size_t index)
+    {
+        return BitVectorProxy(index, this);
+    }
+
+
+private:
+
+
+    // data type
+    typedef __m128i data_t;
+    
+    // Width determines the number of bits used to encode the block data type
+    static const uint8_t _width = sizeof(data_t) * 8;
+
+    // How many elements are we storing in a 32bit small block
+    static const uint8_t _elements_per_small_block = (sizeof(uint32_t)*8) / B;
+    static const uint8_t _elements_per_large_block = 4 * _elements_per_small_block;
+
+    // Pointer to the data, aligned
+    data_t *_data __attribute__((aligned(16))) ;
+
+    size_t _reserved;
+
+    size_t _allocated_blocks;
+    
+public:
+
+    data_t* getData(){ return _data; }
+
+};
+
+/**
+*/
+template<typename T, uint64_t B>
+void BitCompressedVectorVertical<T, B>::set(const size_t index, const value_type v)
+{
+    register size_t block = index / _width;
+
+    register size_t extract_pos = index % 4;
+    register size_t pos_in_extract = index / 4;
+
+
+
+}
+
+/**
+*/
+template<typename T, uint64_t B>
+typename BitCompressedVectorVertical<T, B>::value_type BitCompressedVectorVertical<T, B>::get(const size_t index) const
+{  
+    return value_type();
+}
+
+/**
+*/
+template<typename T, uint64_t B>
+void BitCompressedVectorVertical<T, B>::mget(const size_t index, value_type_ptr __restrict__ data, size_t* __restrict__ actual) const
+{    
 }
 
 #endif // BCV_BCV_H
