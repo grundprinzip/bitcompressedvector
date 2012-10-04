@@ -17,6 +17,19 @@ void test_set(long SIZE)
     std::cout << " OK" << std::endl;
 }
 
+void test_set_vertical(long SIZE)
+{
+    std::cout << "[TEST ] set/get interleaved ..." << std::flush;
+    BitCompressedVectorVertical<int, TEST_BITS> v(SIZE);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1UL << TEST_BITS);
+        v.set(i, a);
+        assert(a == v.get(i));
+    }
+    std::cout << " OK" << std::endl;
+}
+
 void test_get(long SIZE)
 {
     std::cout << "[TEST ] set/get separated ..." << std::flush;
@@ -25,6 +38,26 @@ void test_get(long SIZE)
     {
         int a = i % (1UL << TEST_BITS);
         v.set(i, a);        
+    }
+
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1UL << TEST_BITS);
+        assert(a == v.get(i));
+    }
+    std::cout << " OK" << std::endl;
+}
+
+void test_get_vertical(long SIZE)
+{
+    std::cout << "[TEST ] set/get separated ..." << std::flush;
+    BitCompressedVectorVertical<int, TEST_BITS> v(SIZE);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1UL << TEST_BITS);
+        v.set(i, a);
+        if (i >= 77)
+            assert(13 == v.get(77));
     }
 
     for(size_t i=0; i < SIZE; ++i)
@@ -107,6 +140,8 @@ void runTests()
 	int64_t size = 10000;
 	test_get(size);
 	test_set(size);
+    test_set_vertical(size);
+    test_get_vertical(size);
 	test_mget(size);
     test_vertical(size);
 

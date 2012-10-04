@@ -1,15 +1,16 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
-CC=/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
-CXXFLAGS= -mtune=native -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
+CC=clang++ #/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
+CXXFLAGS= -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
 
 FILES=main.cc test.cc
 
-all: gen
+all: bcv.h test.cc test.h main.cc gen 
 	mkdir -p $(BUILD_DIR)
 	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
-	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g
+	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g -mtune=native 
+
 
 profile:
 	$(CC) -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
