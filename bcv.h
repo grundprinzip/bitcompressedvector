@@ -357,6 +357,9 @@ private:
     static const uint8_t _elements_per_small_block = (sizeof(uint32_t)*8) / B;
     static const uint8_t _elements_per_large_block = _extracts * _elements_per_small_block;
 
+    
+
+
     // Pointer to the data, aligned
     data_t *_data __attribute__((aligned(16))) ;
 
@@ -441,20 +444,42 @@ void BitCompressedVectorVertical<T, B>::set(const size_t index, const value_type
 template<typename T, uint64_t B>
 typename BitCompressedVectorVertical<T, B>::value_type BitCompressedVectorVertical<T, B>::get(const size_t index) const
 {  
+    // Shuffle masks
+    static const int _shuffle2 = 1;
+    static const int _shuffle3 = 2;
+    static const int _shuffle4 = 3;
+
     register size_t block = (index / _extracts) * B / _extract_bits;
     register size_t in_block = index % _extracts;
     register size_t offset_in_block = ((index / _extracts) * B) % _extract_bits;
 
     static int32_t mask = (1 << B) - 1;
 
-    uint32_t part = _mm_extract_epi32(_data[block], in_block);
+
+    uint32_t part;
+
+    switch(in_block)
+    {
+        case 0: part = _mm_cvtsi128_si32(_data[block]); break;
+        case 1: part = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block], _shuffle2)); break;
+        case 2: part = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block], _shuffle3)); break;
+        case 3: part = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block], _shuffle4)); break;
+    }
+    
     part >>= offset_in_block;
     part &= mask;
 
     if (_extract_bits - offset_in_block < B)
     {
         // Get the block + 1
-        int32_t upper = _mm_extract_epi32(_data[block+ 1], in_block);
+        int32_t upper;
+        switch(in_block)
+        {
+            case 0: upper = _mm_cvtsi128_si32(_data[block+1]); break;
+            case 1: upper = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block+1], _shuffle2)); break;
+            case 2: upper = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block+1], _shuffle3)); break;
+            case 3: upper = _mm_cvtsi128_si32(_mm_shuffle_epi32(_data[block+1], _shuffle4)); break;
+        }
         size_t diff = _extract_bits - offset_in_block;
         upper = (upper << diff) & mask;
         part |= upper;

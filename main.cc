@@ -60,8 +60,18 @@ void performance(size_t size)
     {
         actual = 0;
         v.mget(i, tmp, &actual);
-        for(size_t j=0; j < actual & i < size; ++j)
+        assert((actual % 8) == 0);
+        for(size_t j=0; j < actual & i < size; j+=8)
+        {
             res += tmp[j];
+            res += tmp[j+1];
+            res += tmp[j+2];
+            res += tmp[j+3];
+            res += tmp[j+4];
+            res += tmp[j+5];
+            res += tmp[j+6];
+            res += tmp[j+7];
+        }
         i += actual;
 
     }
@@ -82,8 +92,18 @@ void performance(size_t size)
     {
         actual = 0;
         v3.mget(i, tmp, &actual);
-        for(size_t j=0; j < actual & i < size; ++j)
+        assert((actual % 8) == 0);
+        for(size_t j=0; j < actual & i < size; j+=8)
+        {
             res += tmp[j];
+            res += tmp[j+1];
+            res += tmp[j+2];
+            res += tmp[j+3];
+            res += tmp[j+4];
+            res += tmp[j+5];
+            res += tmp[j+6];
+            res += tmp[j+7];
+        }
         i += actual;
     }
     t.stop();
