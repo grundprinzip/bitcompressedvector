@@ -293,13 +293,15 @@ public:
     Typicallay we try to extract at least a single cache line
 
      */
-    inline void mget(const size_t index, value_type_ptr data, size_t* __restrict__ actual) const;
+    inline void mget(const size_t index, value_type_ptr __restrict__ data, size_t* __restrict__ actual) const;
 
     /*
      *  Set method to set a value
      */
     inline void set(const size_t index, const value_type v);
 
+
+    inline void cmp_eq_bv(const size_t index, const value_type v, value_type_ptr __restrict__ data, size_t* __restrict__ actual) const;
 
     /*
         This small class is a simple proxy class that let's us handle reference 
@@ -356,9 +358,6 @@ private:
     static const uint8_t _extract_bits = 32;
     static const uint8_t _elements_per_small_block = (sizeof(uint32_t)*8) / B;
     static const uint8_t _elements_per_large_block = _extracts * _elements_per_small_block;
-
-    
-
 
     // Pointer to the data, aligned
     data_t *_data __attribute__((aligned(16))) ;
@@ -495,6 +494,13 @@ void BitCompressedVectorVertical<T, B>::mget(const size_t index, value_type_ptr 
 {
     register size_t block = (index / _extracts) * B / _extract_bits;
     VerticalBitCompression<B>::decompress(_data + block, data, actual);    
+}
+
+template<typename T, uint64_t B>
+inline void BitCompressedVectorVertical<T,B>::cmp_eq_bv(const size_t index, const value_type cmp, value_type_ptr __restrict__ data, size_t* __restrict__ actual) const
+{
+    register size_t block = (index / _extracts) * B / _extract_bits;
+    VerticalBitCompression<B>::cmp_eq(_data + block, cmp, data, actual);    
 }
 
 #endif // BCV_BCV_H

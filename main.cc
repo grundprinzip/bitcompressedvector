@@ -60,18 +60,18 @@ void performance(size_t size)
     {
         actual = 0;
         v.mget(i, tmp, &actual);
-        assert((actual % 8) == 0);
-        for(size_t j=0; j < actual & i < size; j+=8)
-        {
-            res += tmp[j];
-            res += tmp[j+1];
-            res += tmp[j+2];
-            res += tmp[j+3];
-            res += tmp[j+4];
-            res += tmp[j+5];
-            res += tmp[j+6];
-            res += tmp[j+7];
-        }
+        // assert((actual % 8) == 0);
+        // for(size_t j=0; j < actual & i < size; j+=8)
+        // {
+        //     res += tmp[j];
+        //     res += tmp[j+1];
+        //     res += tmp[j+2];
+        //     res += tmp[j+3];
+        //     res += tmp[j+4];
+        //     res += tmp[j+5];
+        //     res += tmp[j+6];
+        //     res += tmp[j+7];
+        // }
         i += actual;
 
     }
@@ -92,18 +92,50 @@ void performance(size_t size)
     {
         actual = 0;
         v3.mget(i, tmp, &actual);
-        assert((actual % 8) == 0);
-        for(size_t j=0; j < actual & i < size; j+=8)
-        {
-            res += tmp[j];
-            res += tmp[j+1];
-            res += tmp[j+2];
-            res += tmp[j+3];
-            res += tmp[j+4];
-            res += tmp[j+5];
-            res += tmp[j+6];
-            res += tmp[j+7];
-        }
+        // assert((actual % 8) == 0);
+        // for(size_t j=0; j < actual & i < size; j+=8)
+        // {
+        //     res += tmp[j];
+        //     res += tmp[j+1];
+        //     res += tmp[j+2];
+        //     res += tmp[j+3];
+        //     res += tmp[j+4];
+        //     res += tmp[j+5];
+        //     res += tmp[j+6];
+        //     res += tmp[j+7];
+        // }
+        i += actual;
+    }
+    t.stop();
+    std::cout << res << " " << (c = t.elapsed_time()) << " ";
+    //std::cout << papi.first << " " << papi.second << std::endl;
+    free(tmp);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // VErtical CMP
+    res = 0;
+    alloca = 100000;
+    tmp = (int*) malloc(sizeof(int) * alloca);
+    srand(0);
+    const int cmp = rand() % (1 << BITS);
+    
+    t.start();
+    for(size_t i=0; i < size; )       
+    {
+        actual = 0;
+        v3.cmp_eq_bv(i, cmp, tmp, &actual);
+        // assert((actual % 8) == 0);
+        // for(size_t j=0; j < actual & i < size; j+=8)
+        // {
+        //     res += tmp[j];
+        //     res += tmp[j+1];
+        //     res += tmp[j+2];
+        //     res += tmp[j+3];
+        //     res += tmp[j+4];
+        //     res += tmp[j+5];
+        //     res += tmp[j+6];
+        //     res += tmp[j+7];
+        // }
         i += actual;
     }
     t.stop();

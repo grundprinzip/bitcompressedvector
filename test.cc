@@ -100,8 +100,6 @@ void test_mget(long SIZE)
     std::cout << " OK" << std::endl;
 }
 
-
-
 void test_vertical(long SIZE)
 {
     std::cout << "[TEST ] vertical ..." << std::flush;
@@ -129,6 +127,7 @@ void test_vertical(long SIZE)
         assert( tmp[i] == ((i/4 + (i%4) * distance) % (1UL << mybits)) );
         assert( ((i/4 + (i%4) * distance) % (1UL << mybits)) == v[(i/4 + (i%4) * distance)]);
     }
+    std::cout << " OK" << std::endl;
 }
 
 void test_vertical_overlap(long SIZE)
@@ -165,6 +164,42 @@ void test_vertical_overlap(long SIZE)
     std::cout << " OK" << std::endl;
 }
 
+void test_vertical_cmp(long SIZE)
+{
+    std::cout << "[TEST ] vertical overlap ..." << std::flush;
+    long sum = 0, sum2 = 0;
+    const size_t mybits = 5;
+    BitCompressedVectorVertical<int, mybits> v(SIZE);
+    for(size_t i=0; i < SIZE; ++i)
+    {
+        int a = i % (1UL << mybits);
+        v.set(i, a);        
+        sum += a;
+    }
+
+    size_t alloca = mybits * 1000 / 8;
+    int *tmp = (int*) malloc(sizeof(int) * alloca);
+    size_t actual = 0;
+
+    for(size_t i=0; i<SIZE;)
+    {
+        v.cmp_eq_bv(i, 1, (int*) tmp, &actual);
+
+        for(size_t j=0; j < actual && i < SIZE; ++j, ++i)
+        {
+            int a = i % (1UL << TEST_BITS);
+            if (a == 1)
+            {
+                assert(-1 == tmp[j]);
+            } else {
+                assert(0 == tmp[j]);
+            }
+        }
+    }
+    free(tmp);
+    std::cout << " OK" << std::endl;
+}
+
 
 
 
@@ -178,5 +213,6 @@ void runTests()
 	test_mget(size);
     test_vertical(size);
     test_vertical_overlap(size);
+    test_vertical_cmp(size);
 
 }
