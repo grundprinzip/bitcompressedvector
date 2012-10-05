@@ -467,7 +467,9 @@ typename BitCompressedVectorVertical<T, B>::value_type BitCompressedVectorVertic
 */
 template<typename T, uint64_t B>
 void BitCompressedVectorVertical<T, B>::mget(const size_t index, value_type_ptr __restrict__ data, size_t* __restrict__ actual) const
-{    
+{
+    register size_t block = (index / _extracts) * B / _extract_bits;
+    VerticalBitCompression<B>::decompress(_data + block, data, actual);    
 }
 
 #endif // BCV_BCV_H

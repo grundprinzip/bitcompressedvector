@@ -13,14 +13,15 @@ class VerticalBitCompression
 
 public:
 
-    inline static void decompress(const __m128i* data, int* __restrict__ out, size_t* __restrict__ counter);
+    template<int offset>
+    inline static void decompress_block(const __m128i* data, int* __restrict__ out, size_t* __restrict__ counter);
 };
 
 <%#bits%>
 
-
 template<>
-inline void VerticalBitCompression<<%bits%>>::decompress(const __m128i* data, int* out, size_t* __restrict__ counter_out) 
+template<>
+inline void VerticalBitCompression<<%bits%>>::decompress_block<<%offset%>>(const __m128i* data, int* out, size_t* __restrict__ counter_out) 
 { 
     __m128i* moving = reinterpret_cast<__m128i*>(out);
     register __m128i inValue = _mm_load_si128(data);
@@ -51,10 +52,10 @@ inline void VerticalBitCompression<<%bits%>>::decompress(const __m128i* data, in
     inValue = _mm_load_si128(data);
 
     {
-        register __m128i tmp2 = <%and_mask%>;
-        _mm_or_si128(tmp,
+        _mm_store_si128(moving++, 
+          _mm_or_si128(tmp,
             _mm_and_si128(_mm_slli_epi32(inValue, <%shift_left%>),
-                tmp2));
+                mask)));
     }
     counter += 4;
     <%/has_overlap%>
