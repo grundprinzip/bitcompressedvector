@@ -28,7 +28,7 @@ void performance(size_t size)
 
     Timer t;
     long long res = 0;
-    std::cout << "# BITS res get res getv res mget res mgetv res vector" << std::endl;
+    //std::cout << "# BITS res get res getv res mget res mgetv res vector" << std::endl;
     ///////////////////////////////////////////////////////////////////////////
     t.start();
     for(size_t i=0; i < size; i+=1)  
@@ -76,36 +76,15 @@ void performance(size_t size)
     alloca = 100000;
     tmp = (int*) malloc(sizeof(int) * alloca);
 
-    __m128i *data = reinterpret_cast<__m128i*>(v3.getData()); 
+    
     t.start();
     for(size_t i=0; i < size; )       
     {
         actual = 0;
-        
-        VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
+        v3.mget(i, tmp, &actual);
         for(size_t j=0; j < actual & i < size; ++j)
             res += tmp[j];
-        i += actual;        
-        ++data;
-
-        VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        for(size_t j=0; j < actual & i < size; ++j)
-            res += tmp[j];
-        i += actual;        
-        ++data;
-
-        VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        for(size_t j=0; j < actual & i < size; ++j)
-            res += tmp[j];
-        i += actual;        
-        ++data;
-
-        VerticalBitCompression<BITS>::decompress(data, tmp, &actual);
-        for(size_t j=0; j < actual & i < size; ++j)
-            res += tmp[j];
-        i += actual;        
-        ++data;
-
+        i += actual;
     }
     t.stop();
     std::cout << res << " " << (c = t.elapsed_time()) << " ";
@@ -149,39 +128,40 @@ int main(int argc, char* argv[])
     #ifndef NDEBUG
     runTests();
     #endif
-
+    
+    std::cout << "# BITS res get res getv res mget res mgetv res vector" << std::endl;
     performance<1>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<2>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<3>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<4>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<5>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<6>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<7>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<8>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<9>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<10>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<11>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<12>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<13>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<14>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<15>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
     performance<16>(SIZE);
-    std::cout << "#---" << std::endl;
+    //std::cout << "#---" << std::endl;
 
 	return 0;
 }

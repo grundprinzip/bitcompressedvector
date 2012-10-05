@@ -1,4 +1,6 @@
 {{=<% %>=}}
+#ifndef BCV_BITCOMPRESS_HORIZONTAL
+#define BCV_BITCOMPRESS_HORIZONTAL
 
 // SSE requirements
 #include <emmintrin.h>
@@ -141,3 +143,5 @@ inline void BitCompression<<%bits%>>::decompress_large(const __m128i* data, int*
 }
 
 <%/bits%>
+
+#endif

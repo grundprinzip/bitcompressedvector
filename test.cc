@@ -1,5 +1,4 @@
 #include "test.h"
-
 #include <assert.h>
 
 #define TEST_BITS 5ull
@@ -101,7 +100,7 @@ void test_mget(long SIZE)
     std::cout << " OK" << std::endl;
 }
 
-#include "decompress2.h"
+
 
 void test_vertical(long SIZE)
 {
@@ -160,7 +159,6 @@ void test_vertical_overlap(long SIZE)
 
             assert(a == tmp[j]);
         }
-        i += actual;
     }
     free(tmp);
     assert(sum == sum2);

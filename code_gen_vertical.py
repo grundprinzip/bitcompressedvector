@@ -65,9 +65,9 @@ def generate_vertical(offset, bits, type_width, size):
 		
 		data["has_overlap"]["and_mask"] = build_128bit_val(bits, bits, bits, bits)
 		data["has_overlap"]["shift"] = (extractions * bits + offset)
-		data["has_overlap"]["shift_left"] = bits - (type_width - (extractions * bits + offset))
+		data["has_overlap"]["shift_left"] = (type_width - (extractions * bits + offset))
 	else:
-		print "no overlap"
+		pass
 
 
 	return data
@@ -75,12 +75,21 @@ def generate_vertical(offset, bits, type_width, size):
 
 all_data = {}
 all_data["bits"] = []
+all_data["blocks"] = []
 
-for bits in range(5,5+1):
+for bits in range(1,16+1):
+
+	single = {}
+	single["bits"] = bits
+	single["offsets"] = []
 	for x in range(bits / fractions.gcd(bits, TYPE_WIDTH)):
 		# Please somebody should simplify this...
 		offset = (bits - ((32 - ((((x * TYPE_WIDTH) / bits) * bits) % 32)) % 32)) % bits
+		single["offsets"].append({"offset":offset})
+
 		all_data["bits"].append(generate_vertical(offset, bits, TYPE_WIDTH, REGISTER_WIDTH))
+
+	all_data["blocks"].append(single)
 
 print renderer.render_path("tpl/vertical.tpl", all_data)
 
