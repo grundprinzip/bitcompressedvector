@@ -166,7 +166,7 @@ void test_vertical_overlap(long SIZE)
 
 void test_vertical_cmp(long SIZE)
 {
-    std::cout << "[TEST ] vertical overlap ..." << std::flush;
+    std::cout << "[TEST ] vertical cmp_eq_bv ..." << std::flush;
     long sum = 0, sum2 = 0;
     const size_t mybits = 5;
     BitCompressedVectorVertical<int, mybits> v(SIZE);

@@ -41,7 +41,7 @@
 
 
 */
-template<typename T, uint64_t B, bool Horizontal=true>
+template<typename T, uint64_t B>
 class BitCompressedVector
 {
     
@@ -181,8 +181,8 @@ public:
 
 /**
 */
-template<typename T, uint64_t B, bool Horizontal>
-void BitCompressedVector<T, B, Horizontal>::set(const size_t index, const value_type v)
+template<typename T, uint64_t B>
+void BitCompressedVector<T, B>::set(const size_t index, const value_type v)
 {
     uint64_t pos = _getPos(index);
     uint64_t offset = _getOffset(index, pos * _width);
@@ -207,8 +207,8 @@ void BitCompressedVector<T, B, Horizontal>::set(const size_t index, const value_
 
 /**
 */
-template<typename T, uint64_t B, bool Horizontal>
-typename BitCompressedVector<T, B, Horizontal>::value_type BitCompressedVector<T, B, Horizontal>::get(const size_t index) const
+template<typename T, uint64_t B>
+typename BitCompressedVector<T, B>::value_type BitCompressedVector<T, B>::get(const size_t index) const
 {
     value_type result;
     register uint64_t mask;
@@ -235,8 +235,8 @@ typename BitCompressedVector<T, B, Horizontal>::value_type BitCompressedVector<T
 
 /**
 */
-template<typename T, uint64_t B, bool Horizontal>
-void BitCompressedVector<T, B, Horizontal>::mget(const size_t index, value_type_ptr data, size_t *actual) const
+template<typename T, uint64_t B>
+void BitCompressedVector<T, B>::mget(const size_t index, value_type_ptr data, size_t *actual) const
 {
     //assert(128 % index == 0);
     BitCompression<B>::decompress_large(((const __m128i*) _data) + _getPos(index, 128), data, actual);
