@@ -2,15 +2,16 @@ SHELL = /bin/bash
 BUILD_DIR=build
 
 #CC=/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
-CC=clang++
+#CC=clang++
+CXX ?= clang++
 CXXFLAGS= -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
 
 FILES=main.cc test.cc
 
 all: bcv.h test.cc test.h main.cc 
 	mkdir -p $(BUILD_DIR)
-	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
-	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g -mtune=native 
+	$(CXX) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
+	$(CXX) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g -mtune=native 
 
 get-deps:
 	echo "Done"
