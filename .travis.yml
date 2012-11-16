@@ -3,3 +3,6 @@ compiler:
   - clang
 install: make get-deps
 script: make && make test
+branches:
+  only:
+    - master
