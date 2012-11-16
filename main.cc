@@ -180,7 +180,8 @@ int main(int argc, char* argv[])
     #ifndef NDEBUG
     runTests();
     #endif
-    
+
+
     std::cout << "# BITS res get res getv res mget res mgetv res vector" << std::endl;
     performance<1>(SIZE);
     //std::cout << "#---" << std::endl;

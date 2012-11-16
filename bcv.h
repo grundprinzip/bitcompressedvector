@@ -51,29 +51,66 @@ public:
     typedef T&  value_type_ref;
     typedef T*  value_type_ptr;
 
+    typedef BitCompressedVector<T,B> vector_type;
+
 
     /*
     * Constructor
     */
-    explicit BitCompressedVector(size_t size): _reserved(size), _data(0), _allocated_blocks(0)
+    explicit BitCompressedVector(size_t size=0): _reserved(0), _size(0), _data(0), _allocated_blocks(0)
     {       
-        _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
-        posix_memalign((void**) &_data, 16, _allocated_blocks * sizeof(data_t));
-        memset(_data, 0, _allocated_blocks * sizeof(data_t));
+        reserve(size);
+
+        // If the size is set to a value large 0 we assume
+        // a repeated initialization
+        if (size > 0)
+            _size = size;
     }
 
-    /* Deleted assignemnt and copy constructor */
-    BitCompressedVector(BitCompressedVector& other) = delete;
+    
 
-    /* Deleted assignemnt and copy constructor */
-    BitCompressedVector& operator=(const BitCompressedVector& other) = delete;
+    /* copy constructor */
+    BitCompressedVector(const BitCompressedVector& other): _reserved(other._reserved),
+    _size(other._size), _allocated_blocks(other._allocated_blocks), _data(nullptr)
+    {
+        _data = _allocate(_allocated_blocks);
+        std::memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
+    }
 
+    /* assignemnt operator */
+    vector_type& operator=(BitCompressedVector other)
+    {
+        std::swap(_reserved, other._reserved);
+        std::swap(_size, other._size);
+        std::swap(_allocated_blocks, other._allocated_blocks);
+        std::swap(_data, other._data);
+
+        return *this;
+    }
+    
     /* Destructor */
     ~BitCompressedVector()
     {
         free(_data);
     }
 
+
+
+    /*
+    * Returns the used size of the vector
+    */
+    inline uint64_t size() const
+    {
+        return _size;
+    }
+
+    /*
+    * Returns the reserved size of the vector
+    */
+    inline uint64_t capacity() const
+    {
+        return _reserved;
+    }
 
 
     /*
@@ -90,14 +127,53 @@ public:
 
     Typicallay we try to extract at least a single cache line
 
+    This operation is unchecked and will not throw an out of range exception
+    in case the access is illegal
+
      */
     inline void mget(const size_t index, value_type_ptr data, size_t *actual) const;
 
     /*
      *  Set method to set a value
+     *
+     * This method will throw an out of range exception in case the access is illegal
      */
     inline void set(const size_t index, const value_type v);
 
+    /*
+    * Append a new value to the vector
+    */
+    inline void push_back(const value_type v)
+    {
+        if (_size + 1 > _reserved)
+            reserve((_size + 1) * 2);
+
+        // Increase the size
+        set(_size++, v);
+    }
+
+    /*
+    * Perform a resize of the vector.
+    *
+    * Currently, the size can only be increased not decreased.
+    */
+    inline void reserve(size_t size) 
+    {
+        if (_blocks(size) > _allocated_blocks)
+        {
+            data_t *newMemory = _allocate(_blocks(size));
+            // Copy the data from the old data partition to the new partition
+            std::memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
+
+            // Allocate memory
+            _allocated_blocks = _blocks(size);
+            _reserved = _allocated_blocks * _width / B;
+
+            // Swap pointers
+            _data = newMemory;
+
+        }
+    }
 
     /*
         This small class is a simple proxy class that let's us handle reference 
@@ -153,6 +229,8 @@ private:
 
     size_t _reserved;
 
+    size_t _size;
+
     size_t _allocated_blocks;
 
     // get the position of an index inside the list of data values
@@ -173,17 +251,42 @@ private:
         return (index * B) % _width;
     }
 
+    // returns the number of blocks required for the number of
+    // elements to store
+    inline size_t _blocks(size_t elements) const
+    {
+        // Simple ceil implementation
+        return ((elements * B) + _width - 1 )/ _width;
+    }
+
+    /*
+    * Allocate a number of blocks and zero out the memory
+    */
+    inline data_t* _allocate(size_t blocks) const 
+    {
+        data_t *newMemory = nullptr;
+        posix_memalign((void**) &newMemory, 16, blocks * sizeof(data_t));
+        memset(newMemory, 0, blocks * sizeof(data_t));
+        return newMemory;
+    }
+
 public:
 
     data_t* getData(){ return _data; }
 
 };
 
+
 /**
 */
 template<typename T, uint64_t B>
 void BitCompressedVector<T, B>::set(const size_t index, const value_type v)
 {
+    if (index >= _size)
+        throw std::out_of_range("Access not permitted");
+
+
+    // Allocate new memory if required
     uint64_t pos = _getPos(index);
     uint64_t offset = _getOffset(index, pos * _width);
     uint64_t bounds = _width - offset;
@@ -255,23 +358,40 @@ public:
     typedef T&  value_type_ref;
     typedef T*  value_type_ptr;
 
+    typedef BitCompressedVectorVertical<T,B> vector_type;
 
     /*
     * Constructor
     */
-    BitCompressedVectorVertical(size_t size): _reserved(size), _allocated_blocks(0), _data(nullptr)
-    {       
-        _allocated_blocks = (size * B) / (sizeof(data_t) * 8) + 2;
-        posix_memalign((void**) &_data, 16, _allocated_blocks * sizeof(data_t));
-        memset(_data, 0, _allocated_blocks * sizeof(data_t));
+    BitCompressedVectorVertical(size_t size=0): _reserved(size), _size(0), _allocated_blocks(0), _data(nullptr)
+    {   
+        reserve(size);
+
+        // If the size is set to a value large 0 we assume
+        // a repeated initialization
+        if (size > 0)
+            _size = size;        
     }
 
+    /* copy constructor */
+    BitCompressedVectorVertical(const BitCompressedVectorVertical& other):
+        _reserved(other._reserved), _size(other._size), _allocated_blocks(other._allocated_blocks),
+        _data(nullptr)
+    {
+        _data = _allocate(_allocated_blocks);
+        std::memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
+    }
 
-    /* Deleted assignemnt and copy constructor */
-    BitCompressedVectorVertical(BitCompressedVectorVertical& other) = delete;
+    /* assignemnt operator */
+    vector_type& operator=(BitCompressedVectorVertical other)
+    {
+        std::swap(_reserved, other._reserved);
+        std::swap(_size, other._size);
+        std::swap(_allocated_blocks, other._allocated_blocks);
+        std::swap(_data, other._data);
 
-    /* Deleted assignemnt and copy constructor */
-    BitCompressedVectorVertical& operator=(const BitCompressedVectorVertical& other) = delete;
+        return *this;
+    }
 
     ~BitCompressedVectorVertical()
     {
@@ -283,6 +403,56 @@ public:
      */
     inline value_type get(const size_t index) const;
 
+    /*
+    * Returns the used size of the vector
+    */
+    inline uint64_t size() const
+    {
+        return _size;
+    }
+
+    /*
+    * Returns the reserved size of the vector
+    */
+    inline uint64_t capacity() const
+    {
+        return _reserved;
+    }
+
+    /*
+    * Append a new value to the vector
+    */
+    inline void push_back(const value_type v)
+    {
+        if (_size + 1 > _reserved)
+            reserve((_size + 1) * 2);
+
+        // Increase the size
+        set(_size++, v);
+    }
+
+    /*
+    * Perform a resize of the vector.
+    *
+    * Currently, the size can only be increased not decreased.
+    */
+    inline void reserve(size_t size) 
+    {
+        if (_blocks(size) > _allocated_blocks)
+        {
+            data_t *newMemory = _allocate(_blocks(size));
+            // Copy the data from the old data partition to the new partition
+            std::memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
+
+            // Allocate memory
+            _allocated_blocks = _blocks(size);
+            _reserved = _allocated_blocks * _width / B;
+
+            // Swap pointers
+            _data = newMemory;
+
+        }
+    }
 
     /* 
 
@@ -363,8 +533,28 @@ private:
     data_t *_data __attribute__((aligned(16))) ;
 
     size_t _reserved;
+    size_t _size;
 
     size_t _allocated_blocks;
+
+    // returns the number of blocks required for the number of
+    // elements to store
+    inline size_t _blocks(size_t elements) const
+    {
+        // Simple ceil implementation
+        return ((elements * B) + _width - 1 )/ _width;
+    }
+
+    /*
+    * Allocate a number of blocks and zero out the memory
+    */
+    inline data_t* _allocate(size_t blocks) const 
+    {
+        data_t *newMemory = nullptr;
+        posix_memalign((void**) &newMemory, 16, blocks * sizeof(data_t));
+        memset(newMemory, 0, blocks * sizeof(data_t));
+        return newMemory;
+    }
     
 public:
 
@@ -377,6 +567,9 @@ public:
 template<typename T, uint64_t B>
 void BitCompressedVectorVertical<T, B>::set(const size_t index, const value_type v)
 {
+    if (index >= _size)
+        throw std::out_of_range("Index out of range");
+
     register size_t block = (index / _extracts) * B / _extract_bits;
     register size_t in_block = index % _extracts;
     register size_t offset_in_block = ((index / _extracts) * B) % _extract_bits;

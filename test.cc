@@ -200,7 +200,119 @@ void test_vertical_cmp(long SIZE)
     std::cout << " OK" << std::endl;
 }
 
+void test_allocation()
+{
+    BitCompressedVector<int, TEST_BITS> v;
+    std::cout << "[TEST ] allocation ..." << std::flush;
+    
+    uint64_t reserved = 64/TEST_BITS;
+    assert( 0ul == v.size());
+    assert(0 == v.capacity());
 
+    for(size_t i=0; i < reserved+1; ++i)
+        v.push_back(i%TEST_BITS);
+
+    assert((reserved+1) == v.size());
+
+    uint64_t alloca = (3*64)/ TEST_BITS;
+    assert(alloca == v.capacity());
+
+    std::cout << " OK" << std::endl;
+}
+
+void test_large_allocation()
+{
+    BitCompressedVector<int, TEST_BITS> v;
+    std::cout << "[TEST ] allocation large..." << std::flush;
+    
+    assert( 0ul == v.size());
+    assert(0 == v.capacity());
+
+    for(size_t i=0; i < 10000; ++i)
+        v.push_back(i%TEST_BITS);
+
+    assert(10000 == v.size());
+    std::cout << " OK" << std::endl;
+}
+
+void test_allocation_vertical()
+{
+    BitCompressedVectorVertical<int, TEST_BITS> v;
+    std::cout << "[TEST ] allocation vertical..." << std::flush;
+    
+    uint64_t reserved = 128/TEST_BITS;
+    assert( 0ul == v.size());
+    assert(0 == v.capacity());
+
+    for(size_t i=0; i < reserved+1; ++i)
+        v.push_back(i%TEST_BITS);
+
+    assert((reserved+1) == v.size());
+
+    uint64_t alloca = (3*128)/ TEST_BITS;
+    assert(alloca == v.capacity());
+
+    std::cout << " OK" << std::endl;
+}
+
+void test_large_allocation_vert()
+{
+    BitCompressedVectorVertical<int, TEST_BITS> v;
+    std::cout << "[TEST ] allocation vertical large ..." << std::flush;
+    
+    assert( 0ul == v.size());
+    assert(0 == v.capacity());
+
+    for(size_t i=0; i < 10000; ++i)
+        v.push_back(i%TEST_BITS);
+
+    assert(10000 == v.size());
+    std::cout << " OK" << std::endl;
+}
+
+void test_assignment_constructors()
+{
+    std::cout << "[TEST ] assignment..." << std::flush;
+    BitCompressedVector<uint32_t, 5> a(100), b;
+    b = a;
+
+    assert(a.size() == b.size());
+    assert(a.getData() != b.getData());
+    std::cout << " OK" << std::endl;
+}
+
+void test_copy_constructors()
+{
+    std::cout << "[TEST ] copy constructors..." << std::flush;
+    BitCompressedVector<uint32_t, 5> a(100), b;
+    b = BitCompressedVector<uint32_t, 5>(a);
+
+    assert(a.size() == b.size());
+    assert(a.getData() != b.getData());
+    std::cout << " OK" << std::endl;
+}
+
+void test_assignment_constructors_vert()
+{
+    std::cout << "[TEST ] assignment vertical..." << std::flush;
+    BitCompressedVectorVertical<uint32_t, 5> a(100), b;
+    b = a;
+
+    assert(a.size() == b.size());
+    assert(a.getData() != b.getData());
+    std::cout << " OK" << std::endl;
+}
+
+void test_copy_constructors_vert()
+{
+    std::cout << "[TEST ] copy constructors vertical..." << std::flush;
+    BitCompressedVectorVertical<uint32_t, 5> a(100), b;
+    b = BitCompressedVectorVertical<uint32_t, 5>(a);
+
+    assert(a.size() == b.size());
+    assert(a.getData() != b.getData());
+    std::cout << " OK" << std::endl;
+}
 
 
 void runTests()
@@ -214,5 +326,13 @@ void runTests()
     test_vertical(size);
     test_vertical_overlap(size);
     test_vertical_cmp(size);
+    test_allocation();
+    test_large_allocation();
+    test_allocation_vertical();
+    test_large_allocation_vert();
+    test_assignment_constructors();
+    test_copy_constructors();
+    test_assignment_constructors_vert();
+    test_copy_constructors_vert();
 
 }
