@@ -1,7 +1,8 @@
 SHELL = /bin/bash
 BUILD_DIR=build
 
-CC=clang++ #/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
+#CC=/usr/gcc-4.8-20120930/bin/g++-4.8-20120930
+CC=clang++
 CXXFLAGS= -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
 
 FILES=main.cc test.cc
