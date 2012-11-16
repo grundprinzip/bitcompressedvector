@@ -7,13 +7,13 @@ CXXFLAGS= -mssse3 -msse4.1 -m64 -std=c++0x  -Weffc++
 
 FILES=main.cc test.cc
 
-all: bcv.h test.cc test.h main.cc gen 
+all: bcv.h test.cc test.h main.cc 
 	mkdir -p $(BUILD_DIR)
 	$(CC) -o $(BUILD_DIR)/main $(FILES) $(CXXFLAGS) -g2 -O0 -ggdb
 	$(CC) -o $(BUILD_DIR)/main_opt $(FILES) -DNDEBUG $(CXXFLAGS) -funroll-loops -O3 -g -mtune=native 
 
 get-deps:
-	pip install pystache
+	echo "Done"
 
 profile:
 	$(CC) -O3 -o $(BUILD_DIR)/main_opt $(FILES) -g2 -DNDEBUG -lprofiler $(CXXFLAGS)
@@ -40,9 +40,12 @@ release: gen
 	$(RM) -Rf pkg/bcv
 	mkdir -p pkg/bcv
 	cp decompress.h pkg/bcv
+	cp decompress2.h pkg/bcv
 	cp bcv.h pkg/bcv
 	tar -C pkg -zcvf bcv.tgz bcv
 
 
 clean:
 	$(RM) -Rf pkg bcv.tgz $(BUILD_DIR)
+
+.PHONY: decompress.h decompress2.h
