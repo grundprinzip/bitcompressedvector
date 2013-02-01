@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     #endif
 
 
-    std::cout << "# BITS res get res getv res mget res mgetv res vector" << std::endl;
+    std::cout << "# BITS res get res getv res mget res mgetv res cmp_eq_bv_v res vector" << std::endl;
     performance<1>(SIZE);
     //std::cout << "#---" << std::endl;
     performance<2>(SIZE);
@@ -215,6 +215,25 @@ int main(int argc, char* argv[])
     //std::cout << "#---" << std::endl;
     performance<16>(SIZE);
     //std::cout << "#---" << std::endl;
-
+    performance<17>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<18>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<19>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<20>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<21>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<22>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<23>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<24>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<25>(SIZE);
+    //std::cout << "#---" << std::endl;
+    performance<26>(SIZE);
+    //std::cout << "#---" << std::endl;
 	return 0;
 }

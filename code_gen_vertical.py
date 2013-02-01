@@ -77,7 +77,7 @@ all_data = {}
 all_data["bits"] = []
 all_data["blocks"] = []
 
-for bits in range(1,16+1):
+for bits in range(1,27+1):
 
 	single = {}
 	single["bits"] = bits
