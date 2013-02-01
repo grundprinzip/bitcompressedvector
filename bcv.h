@@ -170,7 +170,8 @@ public:
             _reserved = _allocated_blocks * _width / B;
 
             // Swap pointers
-            _data = newMemory;
+            std::swap(_data,newMemory);
+            free(newMemory);
 
         }
     }
