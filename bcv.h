@@ -75,7 +75,7 @@ public:
     _size(other._size), _allocated_blocks(other._allocated_blocks), _data(nullptr)
     {
         _data = _allocate(_allocated_blocks);
-        std::memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
+        memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
     }
 
     /* assignemnt operator */
@@ -164,7 +164,7 @@ public:
         {
             data_t *newMemory = _allocate(_blocks(size));
             // Copy the data from the old data partition to the new partition
-            std::memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
+            memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
 
             // Allocate memory
             _allocated_blocks = _blocks(size);
@@ -381,7 +381,7 @@ public:
         _data(nullptr)
     {
         _data = _allocate(_allocated_blocks);
-        std::memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
+        memcpy(_data, other._data, sizeof(data_t) * _allocated_blocks);
     }
 
     /* assignemnt operator */
@@ -444,7 +444,7 @@ public:
         {
             data_t *newMemory = _allocate(_blocks(size));
             // Copy the data from the old data partition to the new partition
-            std::memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
+            memcpy(newMemory, _data, sizeof(data_t) * _allocated_blocks);
 
             // Allocate memory
             _allocated_blocks = _blocks(size);
