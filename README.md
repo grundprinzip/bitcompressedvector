@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/grundprinzip/bitcompressedvector.png)](https://travis-ci.org/grundprinzip/bitcompressedvector)
 # Bit Compressed Vector
 
 This project provides a simple implementation of a bit compressed vector. This
