@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk7
 install: make get-deps
 script: make && make test
 branches:
