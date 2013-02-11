@@ -1,6 +1,4 @@
-language: cpp
-compiler:
-  - gcc
+language: java
 install: make get-deps
 script: make && make test
 branches:
