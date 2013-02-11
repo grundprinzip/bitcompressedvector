@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstring>
 
 // SSE requirements
 #include <emmintrin.h>
